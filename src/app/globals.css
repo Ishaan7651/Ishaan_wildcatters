@@ -1,0 +1,292 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ------------------------------------------------------------------
+   Saakh — "register & carbon" palette
+   Cool ruled-register paper, carbon-copy violet ink, a red margin line,
+   turmeric for "due soon", neem green for good standing.
+------------------------------------------------------------------- */
+:root {
+  --paper: #eceef5;
+  --paper-deep: #e1e4ef;
+  --sheet: #ffffff;
+  --sheet-2: #f7f8fc;
+  --ink: #16173a;
+  --ink-2: #44476a;
+  --ink-3: #74779a;
+  --ink-4: #a4a7c2;
+  --rule: #dcdfec;
+  --rule-2: #c6cade;
+  --carbon: #3b2db3;
+  --carbon-2: #4f41d0;
+  --carbon-soft: #ebe8ff;
+  --carbon-ink: #2c2296;
+  --stamp: #cf2a3e;
+  --stamp-soft: #fde8eb;
+  --haldi: #e2a000;
+  --haldi-ink: #835600;
+  --haldi-soft: #fff3cc;
+  --neem: #0e7a54;
+  --neem-soft: #dcf2e7;
+  --duplicate: #fbe6ed;
+  --postcard: #fbf3dc;
+  --shadow-rgb: 22 23 58;
+
+  --agent-sutradhar: #16173a;
+  --agent-munshi: #3b2db3;
+  --agent-gawah: #0b7a85;
+  --agent-chowkidar: #b97500;
+  --agent-dakiya: #cf2a3e;
+  --agent-khoji: #1d68ad;
+
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --paper: #0d0e20;
+  --paper-deep: #080917;
+  --sheet: #161830;
+  --sheet-2: #1b1d39;
+  --ink: #ecebfa;
+  --ink-2: #b7b8d6;
+  --ink-3: #8a8cb0;
+  --ink-4: #5d5f84;
+  --rule: #262949;
+  --rule-2: #35385e;
+  --carbon: #9488ff;
+  --carbon-2: #aaa1ff;
+  --carbon-soft: #262250;
+  --carbon-ink: #bbb4ff;
+  --stamp: #ff6474;
+  --stamp-soft: #3b1724;
+  --haldi: #f5c044;
+  --haldi-ink: #f5c044;
+  --haldi-soft: #342a10;
+  --neem: #44cf93;
+  --neem-soft: #0f2f24;
+  --duplicate: #2b1c30;
+  --postcard: #2a2516;
+  --shadow-rgb: 0 0 0;
+
+  --agent-sutradhar: #ecebfa;
+  --agent-munshi: #9d92ff;
+  --agent-gawah: #3cc3cf;
+  --agent-chowkidar: #f0b43a;
+  --agent-dakiya: #ff6474;
+  --agent-khoji: #5aa6ef;
+
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-deep: var(--paper-deep);
+  --color-sheet: var(--sheet);
+  --color-sheet-2: var(--sheet-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-ink-4: var(--ink-4);
+  --color-rule: var(--rule);
+  --color-rule-2: var(--rule-2);
+  --color-carbon: var(--carbon);
+  --color-carbon-2: var(--carbon-2);
+  --color-carbon-soft: var(--carbon-soft);
+  --color-carbon-ink: var(--carbon-ink);
+  --color-stamp: var(--stamp);
+  --color-stamp-soft: var(--stamp-soft);
+  --color-haldi: var(--haldi);
+  --color-haldi-ink: var(--haldi-ink);
+  --color-haldi-soft: var(--haldi-soft);
+  --color-neem: var(--neem);
+  --color-neem-soft: var(--neem-soft);
+  --color-duplicate: var(--duplicate);
+  --color-postcard: var(--postcard);
+
+  --font-sans: var(--font-hind), var(--font-anek-deva), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-anek), var(--font-anek-deva), ui-sans-serif, system-ui, sans-serif;
+  --font-deva: var(--font-anek-deva), var(--font-hind), sans-serif;
+  --font-hand: var(--font-kalam), cursive;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  --shadow-sheet: 0 1px 0 rgb(var(--shadow-rgb) / 0.04), 0 1px 2px rgb(var(--shadow-rgb) / 0.06), 0 8px 24px -12px rgb(var(--shadow-rgb) / 0.18);
+  --shadow-lift: 0 2px 4px rgb(var(--shadow-rgb) / 0.06), 0 18px 40px -16px rgb(var(--shadow-rgb) / 0.32);
+}
+
+html {
+  background: var(--paper);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Fine paper grain over the whole app. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.09  0 0 0 0 0.09  0 0 0 0 0.23  0 0 0 0.035 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+@layer base {
+  ::selection {
+    background: var(--carbon-soft);
+    color: var(--carbon-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--carbon);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+}
+
+@layer components {
+/* ---------- Type helpers ---------- */
+.display {
+  font-family: var(--font-display);
+  font-stretch: 88%;
+  letter-spacing: -0.01em;
+}
+.display-tight {
+  font-family: var(--font-display);
+  font-stretch: 75%;
+  letter-spacing: -0.02em;
+}
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.hand {
+  font-family: var(--font-hand);
+  color: var(--carbon-ink);
+}
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Register surfaces ---------- */
+.ruled {
+  background-color: var(--sheet);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 35px,
+    color-mix(in oklab, var(--carbon) 11%, transparent) 35px,
+    color-mix(in oklab, var(--carbon) 11%, transparent) 36px
+  );
+}
+.margin-line {
+  position: relative;
+}
+.margin-line::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--margin-x, 56px);
+  width: 1.5px;
+  background: color-mix(in oklab, var(--stamp) 55%, transparent);
+}
+.dotted-under {
+  background-image: linear-gradient(to right, var(--rule-2) 40%, transparent 0);
+  background-size: 6px 1px;
+  background-repeat: repeat-x;
+  background-position: 0 100%;
+}
+
+/* Perforation between a slip's counterfoil and body */
+.perforation {
+  background-image: radial-gradient(circle, var(--rule-2) 1.4px, transparent 1.6px);
+  background-size: 2px 9px;
+  background-repeat: repeat-y;
+  background-position: center;
+}
+
+/* Semicircle notches where the counterfoil tears off */
+@media (min-width: 640px) {
+  .parchi-notch {
+    --notch: radial-gradient(circle at 68px 0, transparent 8px, #000 8.5px) top / 100% 51% no-repeat,
+      radial-gradient(circle at 68px 100%, transparent 8px, #000 8.5px) bottom / 100% 51% no-repeat;
+    -webkit-mask: var(--notch);
+    mask: var(--notch);
+  }
+}
+
+.sheet {
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sheet);
+}
+
+}
+
+/* ---------- Motion ---------- */
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.5; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+@keyframes blink {
+  50% { opacity: 0.25; }
+}
+@keyframes march {
+  to { stroke-dashoffset: -16; }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes tick-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes punch {
+  0% { opacity: 0; transform: scale(2.4); }
+  60% { opacity: 1; transform: scale(0.85); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.writing-dot {
+  animation: blink 1s ease-in-out infinite;
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--paper-deep) 25%, var(--sheet-2) 50%, var(--paper-deep) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+  border-radius: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Scrollbars that belong on paper */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule-2) transparent;
+}
+
+input[type="range"] {
+  accent-color: var(--carbon);
+}
