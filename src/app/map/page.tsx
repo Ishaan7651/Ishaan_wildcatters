@@ -93,37 +93,37 @@ export default function MapPage() {
       </PageHeader>
 
       <div className="mb-4 flex flex-wrap items-center gap-3">
-        <div className="flex rounded-full bg-paper-deep p-1 text-[13.5px]" role="tablist" aria-label="Layout">
+        <div className="seg" role="tablist" aria-label="Layout">
           {(
             [
               ["geo", "By city"],
               ["web", "By connection"],
             ] as const
           ).map(([k, l]) => (
-            <button key={k} role="tab" aria-selected={mode === k} onClick={() => setMode(k)} className={clsx("rounded-full px-3.5 py-1.5 font-medium", mode === k ? "bg-sheet text-ink shadow-[var(--shadow-sheet)]" : "text-ink-3")}>
+            <button key={k} role="tab" aria-selected={mode === k} onClick={() => setMode(k)}>
               {l}
             </button>
           ))}
         </div>
-        <label className="flex cursor-pointer items-center gap-2 text-[13.5px] text-ink-2">
+        <label className={clsx("flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-[13.5px] transition-colors", onlyOverdue ? "border-stamp/40 bg-stamp-soft text-stamp" : "border-rule bg-sheet text-ink-2 hover:border-rule-2")}>
           <input type="checkbox" checked={onlyOverdue} onChange={(e) => setOnlyOverdue(e.target.checked)} className="size-4 accent-[var(--stamp)]" />
           Only overdue
         </label>
-        <label className="flex cursor-pointer items-center gap-2 text-[13.5px] text-ink-2">
-          <input type="checkbox" checked={showPaid} onChange={(e) => setShowPaid(e.target.checked)} className="size-4 accent-[var(--carbon)]" />
+        <label className={clsx("flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-[13.5px] transition-colors", showPaid ? "border-mor/40 bg-mor-soft text-mor-ink" : "border-rule bg-sheet text-ink-2 hover:border-rule-2")}>
+          <input type="checkbox" checked={showPaid} onChange={(e) => setShowPaid(e.target.checked)} className="size-4 accent-[var(--mor)]" />
           Show paid-off history
         </label>
         <div className="ml-auto hidden flex-wrap gap-x-4 gap-y-1 text-[12px] text-ink-3 md:flex">
           <Legend color="var(--stamp)" label="Overdue" dash />
-          <Legend color="color-mix(in oklab, var(--carbon) 55%, transparent)" label="Open, not yet due" />
+          <Legend color="color-mix(in oklab, var(--mor) 55%, transparent)" label="Open, not yet due" />
           <Legend color="var(--rule-2)" label="Paid off" />
         </div>
       </div>
 
       <ul className="mb-4 grid gap-2 md:grid-cols-3">
         {insights.map((t) => (
-          <li key={t} className="flex gap-2.5 rounded-2xl border border-rule bg-sheet px-4 py-3 text-[13.5px] text-ink-2">
-            <span className="mt-[7px] size-1.5 shrink-0 rounded-full bg-stamp" />
+          <li key={t} className="flex gap-3 rounded-2xl border border-stamp/20 bg-sheet px-4 py-3 text-[13.5px] leading-snug text-ink-2">
+            <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-stamp-soft text-[12px] font-bold text-stamp">!</span>
             {t}
           </li>
         ))}
@@ -137,7 +137,7 @@ export default function MapPage() {
               </pattern>
               {(["over", "open", "paid"] as const).map((k) => (
                 <marker key={k} id={`arrow-${k}`} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="11" markerHeight="11" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
-                  <path d="M 0 0 L 10 5 L 0 10 z" fill={k === "over" ? "var(--stamp)" : k === "open" ? "var(--carbon)" : "var(--rule-2)"} />
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill={k === "over" ? "var(--stamp)" : k === "open" ? "var(--mor)" : "var(--rule-2)"} />
                 </marker>
               ))}
             </defs>
@@ -167,7 +167,7 @@ export default function MapPage() {
                   key={i}
                   d={`M ${x1} ${y1} Q ${mx} ${my} ${x2} ${y2}`}
                   fill="none"
-                  stroke={kind === "over" ? "var(--stamp)" : kind === "open" ? "color-mix(in oklab, var(--carbon) 55%, transparent)" : "var(--rule-2)"}
+                  stroke={kind === "over" ? "var(--stamp)" : kind === "open" ? "color-mix(in oklab, var(--mor) 55%, transparent)" : "var(--rule-2)"}
                   strokeWidth={w}
                   strokeDasharray={kind === "over" ? "7 5" : kind === "paid" ? "3 4" : undefined}
                   markerEnd={`url(#arrow-${kind})`}
@@ -193,7 +193,7 @@ export default function MapPage() {
                   role="button"
                   aria-label={`${n.name}, score ${n.score}`}
                 >
-                  {n.id === actorId && <circle r={n.r + 7} fill="none" stroke="var(--carbon)" strokeWidth={2} strokeDasharray="3 3" />}
+                  {n.id === actorId && <circle r={n.r + 7} fill="none" stroke="var(--mor)" strokeWidth={2} strokeDasharray="3 3" />}
                   {n.id === selected && <circle r={n.r + 5} fill="none" stroke="var(--ink)" strokeWidth={2} />}
                   <circle r={n.r} fill={`color-mix(in oklab, ${col} 14%, var(--sheet))`} stroke={col} strokeWidth={2} />
                   <text textAnchor="middle" dy="0.36em" fill={col} style={{ font: `700 ${Math.round(n.r * 0.85)}px var(--font-anek)`, fontStretch: "80%" }}>
@@ -234,7 +234,7 @@ export default function MapPage() {
               <Connections title="Owes" list={graph.links.filter((l) => (l.source as N).id === sel.id && l.open > 0)} pick={(l) => l.target as N} />
               <Connections title="Is owed by" list={graph.links.filter((l) => (l.target as N).id === sel.id && l.open > 0)} pick={(l) => l.source as N} />
               <div className="mt-3 flex items-center justify-between">
-                <Link href={`/b/${sel.id}`} className="flex items-center gap-1 text-[13px] font-medium text-carbon hover:underline">
+                <Link href={`/b/${sel.id}`} className="flex items-center gap-1 text-[13px] font-medium text-mor hover:underline">
                   Full record <ArrowUpRight size={14} />
                 </Link>
                 <button onClick={() => setSelected(null)} className="text-[12px] text-ink-3 hover:text-ink">Close</button>

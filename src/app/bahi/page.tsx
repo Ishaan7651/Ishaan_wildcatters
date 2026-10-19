@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import clsx from "clsx";
 import { PenLine } from "lucide-react";
 import type { SlipView } from "@/lib/shared/types";
@@ -9,6 +9,7 @@ import { rupees } from "@/lib/shared/money";
 import { useAppState, useSlips } from "@/lib/client/api";
 import { useApp } from "@/components/providers/Providers";
 import { SlipRow } from "@/components/slip/SlipRow";
+import { MoneyTimeline } from "@/components/home/MoneyTimeline";
 import { Avatar, Button, Empty, PhasePill } from "@/components/ui/primitives";
 import { PageHeader } from "@/components/ui/PageHeader";
 
@@ -27,12 +28,21 @@ function inTab(s: SlipView, tab: Tab) {
   return true;
 }
 
+const noSubscribe = () => () => {};
+function sideFromUrl() {
+  const q = new URLSearchParams(window.location.search).get("side");
+  return q === "lena" || q === "dena" ? q : null;
+}
+
 export default function LedgerPage() {
   const { actorId, openSlip, openComposer } = useApp();
   const { data: slips } = useSlips(actorId);
   const { data: state } = useAppState(actorId);
   const [tab, setTab] = useState<Tab>("open");
-  const [side, setSide] = useState<"all" | "lena" | "dena">("all");
+  // The scale on the home page links here with ?side=lena or ?side=dena.
+  const linked = useSyncExternalStore(noSubscribe, sideFromUrl, () => null);
+  const [picked, setSide] = useState<"all" | "lena" | "dena" | null>(null);
+  const side = picked ?? linked ?? "all";
 
   const rows = useMemo(
     () =>
@@ -59,24 +69,28 @@ export default function LedgerPage() {
           </Button>
         }
       >
-        Every slip you&apos;re part of. <b>Lena</b> is money owed to you, <b>dena</b> is money you owe.
+        Every slip you&apos;re part of. <b className="text-neem">Lena</b> is money owed to you, <b className="text-ink">dena</b> is money you owe.
       </PageHeader>
 
+      {slips && state && slips.some((x) => x.status === "confirmed") && (
+        <section className="sheet mb-8 p-4 sm:p-6" aria-label="Open slips by due date">
+          <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="display text-[19px] font-bold text-ink">Open slips, by due date</h2>
+            <p className="text-[12.5px] text-ink-3">Left of today is late. Each late month costs the borrower a point.</p>
+          </div>
+          <MoneyTimeline slips={slips} actorId={actorId} />
+        </section>
+      )}
+
       <div className="mb-5 flex flex-wrap items-center gap-3">
-        <div className="flex rounded-full bg-paper-deep p-1" role="tablist">
+        <div className="seg" role="tablist">
           {TABS.map(([k, l]) => (
-            <button
-              key={k}
-              role="tab"
-              aria-selected={tab === k}
-              onClick={() => setTab(k)}
-              className={clsx("rounded-full px-3.5 py-1.5 text-[13.5px] font-medium", tab === k ? "bg-sheet text-ink shadow-[var(--shadow-sheet)]" : "text-ink-3 hover:text-ink")}
-            >
+            <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)}>
               {l} <span className="text-ink-4 tabular">{counts[k] ?? 0}</span>
             </button>
           ))}
         </div>
-        <div className="flex rounded-full border border-rule p-1 text-[13px]">
+        <div className="flex rounded-full border border-rule bg-sheet p-1 text-[13px]">
           {(
             [
               ["all", "Both"],
@@ -84,7 +98,7 @@ export default function LedgerPage() {
               ["dena", "Dena · to pay"],
             ] as const
           ).map(([k, l]) => (
-            <button key={k} onClick={() => setSide(k)} className={clsx("rounded-full px-3 py-1", side === k ? "bg-carbon-soft font-semibold text-carbon" : "text-ink-3 hover:text-ink")}>
+            <button key={k} onClick={() => setSide(k)} aria-pressed={side === k} className={clsx("rounded-full px-3 py-1", side === k ? (k === "lena" ? "bg-neem-soft font-semibold text-neem" : "bg-paper-deep font-semibold text-ink") : "text-ink-3 hover:text-ink")}>
               {l}
             </button>
           ))}
@@ -114,7 +128,7 @@ export default function LedgerPage() {
                   <li key={s.id}>
                     <button
                       onClick={() => openSlip(s.id)}
-                      className="grid w-full grid-cols-[84px_minmax(0,1fr)_100px_100px_84px_150px_36px] items-center border-b border-[color-mix(in_oklab,var(--carbon)_12%,transparent)] px-2 py-2.5 text-left hover:bg-carbon-soft/30"
+                      className="grid w-full grid-cols-[84px_minmax(0,1fr)_100px_100px_84px_150px_36px] items-center border-b border-[color-mix(in_oklab,var(--mor)_12%,transparent)] px-2 py-2.5 text-left hover:bg-mor-soft/30"
                     >
                       <span className="border-r-[1.5px] border-stamp/40 pr-2 pl-2 font-mono text-[11.5px] text-ink-3">
                         {prettyDay(istDay(s.raisedAt), false)}
@@ -128,7 +142,7 @@ export default function LedgerPage() {
                         </span>
                       </span>
                       <span className="hand text-right text-[19px] text-neem">{mine ? rupees(s.amount) : ""}</span>
-                      <span className="hand text-right text-[19px] text-stamp">{!mine ? rupees(s.amount) : ""}</span>
+                      <span className="hand text-right text-[19px] text-ink">{!mine ? rupees(s.amount) : ""}</span>
                       <span className="pl-4 text-[13px] text-ink-2">{prettyDay(s.dueDate, false)}</span>
                       <span>
                         <PhasePill slip={s} />
@@ -143,7 +157,7 @@ export default function LedgerPage() {
               <span />
               <span className="eyebrow pl-4">Total · {rows.length} slips</span>
               <span className="hand text-right text-[20px] font-bold text-neem">{rupees(lena)}</span>
-              <span className="hand text-right text-[20px] font-bold text-stamp">{rupees(dena)}</span>
+              <span className="hand text-right text-[20px] font-bold text-ink">{rupees(dena)}</span>
               <span className="col-span-3 pl-4 text-[13px] text-ink-2">
                 Net <b className={lena - dena >= 0 ? "text-neem" : "text-stamp"}>{lena - dena >= 0 ? "+" : "−"}{rupees(Math.abs(lena - dena))}</b>
               </span>

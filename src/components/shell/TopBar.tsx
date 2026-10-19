@@ -14,31 +14,39 @@ export function TopBar() {
   const { actorId, theme, toggleTheme, setDiaryOpen } = useApp();
   const { data } = useAppState(actorId);
   return (
-    <header className="sticky top-0 z-40 border-b border-rule bg-[color-mix(in_oklab,var(--paper)_86%,transparent)] backdrop-blur-md">
-      <div className="mx-auto flex h-[60px] max-w-[1680px] items-center gap-3 px-4 sm:px-6">
-        <Link href="/" className="flex items-baseline gap-2 pr-2 md:w-[204px]" aria-label="Saakh home">
-          <span className="font-deva text-[27px] leading-none font-bold text-carbon">साख</span>
-          <span className="display hidden text-[13px] font-semibold tracking-[0.16em] text-ink-3 uppercase sm:inline">Saakh</span>
+    <header className="sticky top-0 z-40 border-b border-rule/70 bg-[color-mix(in_oklab,var(--paper)_88%,transparent)] backdrop-blur-md">
+      <div className="mx-auto flex h-[64px] max-w-[1560px] items-center gap-3 px-4 sm:px-6">
+        <Link href="/" className="group flex items-center gap-2.5 pr-2 md:w-[212px]" aria-label="Saakh home">
+          <span className="grid h-9 -rotate-3 place-items-center rounded-[10px] bg-genda px-2 font-deva text-[22px] leading-none font-bold text-on-genda shadow-[0_2px_0_var(--genda-2)] transition-transform group-hover:rotate-0">
+            <span className="translate-y-[2px]">साख</span>
+          </span>
+          <span className="hidden leading-none sm:block">
+            <span className="display-wide block text-[17px] text-ink">Saakh</span>
+            <span className="block text-[10.5px] font-medium text-ink-3">your word, on record</span>
+          </span>
         </Link>
 
-        <div className="flex flex-1 items-center justify-end gap-2 sm:gap-3">
+        <div className="flex flex-1 items-center justify-end gap-2 sm:gap-2.5">
           {data && (
             <span
               className={clsx(
-                "hidden items-center gap-2 rounded-full border px-3 py-1 text-[12px] lg:inline-flex",
-                data.ai.mode === "ai" ? "border-neem/30 text-ink-2" : "border-haldi/50 text-haldi-ink",
+                "hidden items-center gap-2 rounded-full px-3 py-1 text-[12px] font-medium xl:inline-flex",
+                data.ai.mode === "ai" ? "bg-neem-soft text-neem" : "bg-haldi-soft text-haldi-ink",
               )}
               title={data.ai.mode === "ai" ? `Agents run on OpenRouter · ${data.ai.model}` : "No OpenRouter key — agents use the built-in rules. Add OPENROUTER_API_KEY to .env.local."}
             >
-              <span className={clsx("size-1.5 rounded-full", data.ai.mode === "ai" ? "bg-neem" : "bg-haldi")} />
-              {data.ai.mode === "ai" ? `AI agents · ${data.ai.model.split("/").pop()}` : "Rules mode (no AI key)"}
+              <span className="relative flex size-2">
+                <span className={clsx("absolute inset-0 rounded-full", data.ai.mode === "ai" ? "bg-neem" : "bg-haldi")} style={{ animation: "pulse-ring 2s ease-out infinite" }} />
+                <span className={clsx("relative size-2 rounded-full", data.ai.mode === "ai" ? "bg-neem" : "bg-haldi")} />
+              </span>
+              {data.ai.mode === "ai" ? `AI on · ${data.ai.model.split("/").pop()}` : "Rules mode (no AI key)"}
             </span>
           )}
           <TimeMachine />
           <PersonaSwitcher />
           <button
             onClick={() => setDiaryOpen(true)}
-            className="grid size-9 place-items-center rounded-full text-ink-2 hover:bg-paper-deep hover:text-ink min-[1360px]:hidden"
+            className="grid size-9 place-items-center rounded-full text-ink-2 hover:bg-paper-deep hover:text-ink md:hidden"
             aria-label="Open the agents' diary"
             title="Agents' diary"
           >
@@ -102,7 +110,7 @@ function PersonaSwitcher() {
                   setOpen(false);
                   setQ("");
                 }}
-                className={clsx("flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-left hover:bg-paper-deep", b.id === actorId && "bg-carbon-soft/70")}
+                className={clsx("flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-left hover:bg-paper-deep", b.id === actorId && "bg-mor-soft/70")}
               >
                 <Avatar id={b.id} name={b.name} size={34} />
                 <span className="min-w-0 flex-1">
@@ -112,7 +120,7 @@ function PersonaSwitcher() {
                   </span>
                 </span>
                 <ScoreChip score={b.score} band={b.band} />
-                {b.id === actorId && <Check size={16} className="text-carbon" />}
+                {b.id === actorId && <Check size={16} className="text-mor" />}
               </button>
             </li>
           ))}
@@ -170,7 +178,7 @@ function TimeMachine() {
       >
         <Clock3 size={15} />
         <span className="hidden sm:inline">{today ? weekdayDay(today) : "…"}</span>
-        {data?.clock.simulated && <span className="rounded-full bg-haldi px-1.5 text-[11px] font-bold text-white dark:text-[#1b1400]">{offset > 0 ? `+${offset}d` : `${offset}d`}</span>}
+        {data?.clock.simulated && <span className="rounded-full bg-haldi px-1.5 text-[11px] font-bold text-white">{offset > 0 ? `+${offset}d` : `${offset}d`}</span>}
       </button>
       <Popover open={open} onClose={() => setOpen(false)} className="w-[min(92vw,380px)] p-5">
         <p className="eyebrow">Time machine</p>

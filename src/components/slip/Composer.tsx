@@ -119,11 +119,11 @@ function ComposerForm({ prefill, today }: { prefill: ComposerPrefill; today: str
         <div>
           <label className="eyebrow" htmlFor="party">Business</label>
           {chosen ? (
-            <div className="mt-1.5 flex items-center gap-3 rounded-xl border border-carbon/40 bg-carbon-soft/50 px-3 py-2">
+            <div className="mt-1.5 flex items-center gap-3 rounded-xl border border-mor/40 bg-mor-soft/50 px-3 py-2">
               <Avatar id={chosen.id} name={chosen.name} size={32} />
               <span className="flex-1 text-[14px] font-semibold">{chosen.name}</span>
               <ScoreChip score={chosen.score} band={chosen.band} />
-              <button type="button" className="text-[12px] text-carbon" onClick={() => setParty("")}>
+              <button type="button" className="text-[12px] text-mor" onClick={() => setParty("")}>
                 Change
               </button>
             </div>
@@ -134,7 +134,7 @@ function ComposerForm({ prefill, today }: { prefill: ComposerPrefill; today: str
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="Search, or type a new business name"
-                className="mt-1.5 w-full rounded-xl border border-rule-2 bg-sheet px-3 py-2.5 text-[15px] outline-none focus:border-carbon"
+                className="mt-1.5 w-full rounded-xl border border-rule-2 bg-sheet px-3 py-2.5 text-[15px] outline-none focus:border-mor"
                 autoComplete="off"
               />
               <ul className="mt-1.5 space-y-0.5">
@@ -161,7 +161,7 @@ function ComposerForm({ prefill, today }: { prefill: ComposerPrefill; today: str
 
         <div>
           <label className="eyebrow" htmlFor="amount">Amount</label>
-          <div className="mt-1.5 flex items-center gap-2 rounded-xl border border-rule-2 bg-sheet px-3 py-1.5 focus-within:border-carbon">
+          <div className="mt-1.5 flex items-center gap-2 rounded-xl border border-rule-2 bg-sheet px-3 py-1.5 focus-within:border-mor">
             <span className="hand text-[26px]">₹</span>
             <input
               id="amount"
@@ -184,7 +184,7 @@ function ComposerForm({ prefill, today }: { prefill: ComposerPrefill; today: str
               value={due}
               min={addDays(today, -365)}
               onChange={(e) => setDue(e.target.value)}
-              className="mt-1.5 w-full rounded-xl border border-rule-2 bg-sheet px-3 py-2.5 text-[15px] outline-none focus:border-carbon"
+              className="mt-1.5 w-full rounded-xl border border-rule-2 bg-sheet px-3 py-2.5 text-[15px] outline-none focus:border-mor"
             />
           </div>
           <div>
@@ -194,7 +194,7 @@ function ComposerForm({ prefill, today }: { prefill: ComposerPrefill; today: str
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="50 kg jeera"
-              className="mt-1.5 w-full rounded-xl border border-rule-2 bg-sheet px-3 py-2.5 text-[15px] outline-none focus:border-carbon"
+              className="mt-1.5 w-full rounded-xl border border-rule-2 bg-sheet px-3 py-2.5 text-[15px] outline-none focus:border-mor"
             />
           </div>
         </div>

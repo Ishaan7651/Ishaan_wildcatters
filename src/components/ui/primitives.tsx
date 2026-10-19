@@ -10,14 +10,16 @@ import { spanLabel } from "@/lib/shared/dates";
 
 // ---------- Button ----------
 
-type BtnVariant = "primary" | "secondary" | "ghost" | "danger" | "quiet";
+type BtnVariant = "primary" | "voice" | "secondary" | "ghost" | "danger" | "quiet";
 const BTN: Record<BtnVariant, string> = {
   primary:
-    "bg-carbon text-white hover:bg-carbon-2 shadow-[0_1px_0_rgb(255_255_255/0.2)_inset,0_6px_16px_-8px_var(--carbon)] dark:text-[#0d0e20]",
+    "bg-mor text-on-mor hover:bg-mor-2 shadow-[0_1px_0_rgb(255_255_255/0.18)_inset,0_8px_18px_-10px_var(--mor)]",
+  voice:
+    "bg-genda text-on-genda font-semibold hover:bg-genda-2 shadow-[0_1px_0_rgb(255_255_255/0.45)_inset,0_8px_18px_-10px_var(--genda-2)]",
   secondary: "bg-sheet text-ink border border-rule-2 hover:border-ink-3 hover:bg-sheet-2",
   ghost: "text-ink-2 hover:bg-paper-deep hover:text-ink",
   danger: "bg-sheet text-stamp border border-stamp/40 hover:bg-stamp-soft",
-  quiet: "text-carbon hover:bg-carbon-soft",
+  quiet: "text-mor hover:bg-mor-soft",
 };
 
 export const Button = forwardRef<
@@ -32,7 +34,7 @@ export const Button = forwardRef<
         "inline-flex items-center justify-center gap-2 rounded-full font-medium transition-[background,border,color,transform] duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 cursor-pointer select-none whitespace-nowrap",
         size === "sm" && "h-8 px-3 text-[13px]",
         size === "md" && "h-10 px-4 text-[14px]",
-        size === "lg" && "h-12 px-6 text-[15px]",
+        size === "lg" && "h-12 px-6 text-[15.5px]",
         BTN[variant],
         className,
       )}
@@ -46,10 +48,13 @@ export const Button = forwardRef<
 
 // ---------- Avatar ----------
 
+// Avatar hues, picked to stay clear of violet and magenta.
+const HUES = [30, 55, 85, 125, 155, 180, 205, 230];
+
 function hue(id: string) {
   let h = 0;
-  for (const c of id) h = (h * 31 + c.charCodeAt(0)) % 360;
-  return h;
+  for (const c of id) h = (h * 31 + c.charCodeAt(0)) % 9973;
+  return HUES[h % HUES.length];
 }
 
 export function Avatar({ id, name, size = 36, className }: { id: string; name: string; size?: number; className?: string }) {
@@ -105,7 +110,7 @@ export function AgentGlyph({ agent, size = 26, className }: { agent: AgentName; 
 
 export const BAND_COLOR: Record<Band, string> = {
   excellent: "var(--neem)",
-  good: "var(--carbon)",
+  good: "var(--mor)",
   watch: "var(--haldi-ink)",
   risky: "var(--stamp)",
 };
@@ -137,7 +142,7 @@ export function ScoreChip({ score, band, className }: { score: number; band: Ban
 }
 
 const PHASE: Record<Phase, { label: (s: SlipView) => string; fg: string; bg: string }> = {
-  awaiting: { label: () => "Awaiting confirmation", fg: "var(--carbon)", bg: "var(--carbon-soft)" },
+  awaiting: { label: () => "Awaiting confirmation", fg: "var(--mor)", bg: "var(--mor-soft)" },
   disputed: { label: () => "Disputed", fg: "var(--stamp)", bg: "var(--stamp-soft)" },
   countered: { label: (s) => `Counter: ₹${s.dispute?.counterAmount?.toLocaleString("en-IN")}`, fg: "var(--haldi-ink)", bg: "var(--haldi-soft)" },
   withdrawn: { label: () => "Withdrawn", fg: "var(--ink-3)", bg: "var(--paper-deep)" },
@@ -145,7 +150,7 @@ const PHASE: Record<Phase, { label: (s: SlipView) => string; fg: string; bg: str
   due_soon: { label: (s) => `Due in ${s.daysToDue} day${s.daysToDue === 1 ? "" : "s"}`, fg: "var(--haldi-ink)", bg: "var(--haldi-soft)" },
   due_today: { label: () => "Due today", fg: "var(--haldi-ink)", bg: "var(--haldi-soft)" },
   overdue: { label: (s) => `${spanLabel(s.daysOverdue)} overdue`, fg: "var(--stamp)", bg: "var(--stamp-soft)" },
-  payment_claimed: { label: () => "Payment to confirm", fg: "var(--carbon)", bg: "var(--carbon-soft)" },
+  payment_claimed: { label: () => "Payment to confirm", fg: "var(--mor)", bg: "var(--mor-soft)" },
   paid_on_time: { label: () => "Paid on time", fg: "var(--neem)", bg: "var(--neem-soft)" },
   paid_late: { label: (s) => `Paid ${s.daysOverdue}d late`, fg: "var(--ink-2)", bg: "var(--paper-deep)" },
 };

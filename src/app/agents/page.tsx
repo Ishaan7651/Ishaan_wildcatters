@@ -69,7 +69,7 @@ export default function AgentsPage() {
           const a = AGENTS[name];
           const st = data?.stats.find((s) => s.name === name);
           return (
-            <article key={name} className="sheet flex flex-col p-5">
+            <article key={name} className="sheet flex flex-col overflow-hidden p-5 pt-6" style={{ boxShadow: `inset 0 4px 0 ${a.color}, var(--shadow-sheet)` }}>
               <div className="flex items-start gap-3.5">
                 <AgentGlyph agent={name} size={48} />
                 <div className="min-w-0 flex-1">
@@ -124,7 +124,7 @@ export default function AgentsPage() {
 
       <section className="mt-10">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="display flex items-baseline gap-2 text-[22px] font-semibold text-ink">
+          <h2 className="display flex items-baseline gap-2 text-[22px] font-bold text-ink">
             Roznamcha <span className="font-deva text-[15px] font-normal text-ink-4">रोज़नामचा</span>
           </h2>
           <div className="flex flex-wrap gap-1.5">

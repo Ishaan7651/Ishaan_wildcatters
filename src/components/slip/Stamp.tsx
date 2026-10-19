@@ -7,7 +7,7 @@ import { prettyDay } from "@/lib/shared/dates";
 export type StampKind = "confirmed" | "paid" | "disputed" | "countered" | "withdrawn";
 
 const STAMPS: Record<StampKind, { en: string; hi: string; color: string }> = {
-  confirmed: { en: "CONFIRMED", hi: "स्वीकृत", color: "var(--carbon)" },
+  confirmed: { en: "CONFIRMED", hi: "स्वीकृत", color: "var(--mor)" },
   paid: { en: "PAID", hi: "चुकता", color: "var(--neem)" },
   disputed: { en: "DISPUTED", hi: "विवादित", color: "var(--stamp)" },
   countered: { en: "REVISION ASKED", hi: "संशोधन", color: "var(--haldi-ink)" },

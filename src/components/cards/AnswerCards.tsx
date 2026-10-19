@@ -32,7 +32,7 @@ export function ProfileCard({ profile }: { profile: Profile }) {
   return (
     <div className="sheet overflow-hidden">
       <div className="flex flex-col gap-5 p-5 sm:flex-row sm:items-center">
-        <ScoreRing score={score.score} band={score.band} penalties={score.penalties} size={150} />
+        <ScoreRing score={score.score} band={score.band} penalties={score.penalties} size={132} />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="display text-[24px] leading-tight font-semibold text-ink">{b.name}</h3>
@@ -41,7 +41,7 @@ export function ProfileCard({ profile }: { profile: Profile }) {
           <p className="text-[13.5px] text-ink-3">
             {b.owner} · {b.category} · {b.market}, {b.city}
           </p>
-          <dl className="mt-4 grid grid-cols-2 gap-x-5 gap-y-3 sm:grid-cols-4">
+          <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-4">
             <Stat label="Pending" value={`${pending.count}`} sub={rupees(pending.amount)} />
             <Stat label="Overdue" value={`${pending.overdueCount}`} sub={pending.overdueCount ? `${rupees(pending.overdueAmount)} · oldest ${spanLabel(pending.oldestOverdueDays)}` : "none"} bad={pending.overdueCount > 0} />
             <Stat label="Paid on time" value={stats.onTimeRate === null ? "—" : `${Math.round(stats.onTimeRate * 100)}%`} sub={`${stats.closedCount} paid`} />
@@ -51,7 +51,7 @@ export function ProfileCard({ profile }: { profile: Profile }) {
       </div>
       <Link
         href={`/b/${b.id}`}
-        className="flex items-center justify-between border-t border-rule bg-sheet-2 px-5 py-2.5 text-[13px] font-medium text-carbon hover:bg-carbon-soft/50"
+        className="flex items-center justify-between border-t border-rule bg-sheet-2 px-5 py-2.5 text-[13px] font-medium text-mor hover:bg-mor-soft/50"
       >
         Full record — why each point was lost
         <ArrowUpRight size={15} />

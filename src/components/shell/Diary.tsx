@@ -116,7 +116,7 @@ function RunEntry({ run }: { run: AgentRun }) {
         </div>
         <p className={clsx("mt-1 text-[13.5px] leading-snug", run.status === "error" ? "text-stamp" : "text-ink-2", !open && "line-clamp-3")}>{run.summary}</p>
         {run.steps.length > 0 && (
-          <button onClick={() => setOpen((o) => !o)} className="mt-1 flex items-center gap-1 text-[11.5px] font-medium text-ink-3 hover:text-carbon" aria-expanded={open}>
+          <button onClick={() => setOpen((o) => !o)} className="mt-1 flex items-center gap-1 text-[11.5px] font-medium text-ink-3 hover:text-mor" aria-expanded={open}>
             <ChevronRight size={12} className={clsx("transition-transform", open && "rotate-90")} />
             {run.steps.length} step{run.steps.length === 1 ? "" : "s"}
             {run.mode === "offline" ? " · rules" : run.model ? ` · ${run.model.split("/").pop()}` : ""}
@@ -147,19 +147,19 @@ function LiveEntry({ turn }: { turn: Turn }) {
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
-      className="relative grid grid-cols-[62px_1fr] bg-carbon-soft/40 pr-4"
+      className="relative grid grid-cols-[62px_1fr] bg-mor-soft/40 pr-4"
     >
-      <time className="pt-3.5 pr-2 text-right font-mono text-[10.5px] text-carbon">now</time>
+      <time className="pt-3.5 pr-2 text-right font-mono text-[10.5px] text-mor">now</time>
       <div className="min-w-0 py-3 pl-3.5">
         <div className="flex items-center gap-2">
           <AgentGlyph agent={agent} size={22} />
           <span className="text-[13px] font-semibold text-ink">{AGENTS[agent].title}</span>
-          <span className="text-[11.5px] text-carbon">
+          <span className="text-[11.5px] text-mor">
             is working<span className="writing-dot">…</span>
           </span>
         </div>
         <p className="hand mt-1 truncate text-[15px]">“{turn.utterance}”</p>
-        <div className="mt-1 border-l border-carbon/30 pl-2.5">
+        <div className="mt-1 border-l border-mor/30 pl-2.5">
           {turn.steps.map((s, i) => (
             <motion.div key={i} initial={{ opacity: 0, x: -4 }} animate={{ opacity: 1, x: 0 }}>
               <StepLine step={s} compact />

@@ -146,7 +146,7 @@ export function Toaster() {
               <span
                 className={clsx(
                   "mt-1.5 size-2 shrink-0 rounded-full",
-                  t.tone === "good" ? "bg-neem" : t.tone === "warn" ? "bg-haldi" : t.tone === "bad" ? "bg-stamp" : "bg-carbon",
+                  t.tone === "good" ? "bg-neem" : t.tone === "warn" ? "bg-haldi" : t.tone === "bad" ? "bg-stamp" : "bg-mor",
                 )}
               />
             )}

@@ -50,7 +50,7 @@ function ProfileView({ p, today, isMe }: { p: Profile; today: string; isMe: bool
             <Avatar id={b.id} name={b.name} size={44} />
             <div className="min-w-0">
               <p className="eyebrow">{isMe ? "Your Saakh record" : "Saakh record"}</p>
-              <h1 className="display truncate text-[34px] leading-tight font-semibold text-ink sm:text-[42px]">{b.name}</h1>
+              <h1 className="display-wide truncate text-[32px] leading-tight text-ink sm:text-[42px]">{b.name}</h1>
             </div>
           </div>
           <p className="mt-2 text-[15px] text-ink-2">
@@ -135,7 +135,7 @@ function ProfileView({ p, today, isMe }: { p: Profile; today: string; isMe: bool
       </div>
 
       <section className="mt-8">
-        <div className="mb-3 flex rounded-full bg-paper-deep p-1 sm:inline-flex" role="tablist">
+        <div className="seg mb-3 max-w-full overflow-x-auto" role="tablist">
           {(
             [
               ["owes", `${isMe ? "You owe" : "They owe"}`, p.owes.length],
@@ -148,7 +148,7 @@ function ProfileView({ p, today, isMe }: { p: Profile; today: string; isMe: bool
               role="tab"
               aria-selected={tab === k}
               onClick={() => setTab(k)}
-              className={clsx("flex-1 rounded-full px-4 py-1.5 text-[13.5px] font-medium", tab === k ? "bg-sheet text-ink shadow-[var(--shadow-sheet)]" : "text-ink-3")}
+              className="whitespace-nowrap"
             >
               {l} <span className="text-ink-4">{n}</span>
             </button>
@@ -172,7 +172,7 @@ function Fact({ label, value, sub, bad }: { label: string; value: string; sub: s
   return (
     <div>
       <dt className="eyebrow !text-[10.5px]">{label}</dt>
-      <dd className={clsx("display text-[24px] leading-tight font-semibold tabular", bad ? "text-stamp" : "text-ink")}>{value}</dd>
+      <dd className={clsx("display text-[25px] leading-tight font-bold tabular", bad ? "text-stamp" : "text-ink")}>{value}</dd>
       <dd className="text-[12px] text-ink-3">{sub}</dd>
     </div>
   );

@@ -3,78 +3,92 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* ------------------------------------------------------------------
-   Saakh — "register & carbon" palette
-   Cool ruled-register paper, carbon-copy violet ink, a red margin line,
-   turmeric for "due soon", neem green for good standing.
+   Saakh — "bazaar" palette
+   Peacock teal (mor) for anything you can act on, marigold (genda) for
+   the voice and the things worth noticing, sindoor red for late money,
+   neem green for money that came home, saffron (haldi) for "due soon".
+   Neutrals lean cool mint so nothing reads violet.
 ------------------------------------------------------------------- */
 :root {
-  --paper: #eceef5;
-  --paper-deep: #e1e4ef;
+  --paper: #edf3f1;
+  --paper-deep: #e0e9e6;
   --sheet: #ffffff;
-  --sheet-2: #f7f8fc;
-  --ink: #16173a;
-  --ink-2: #44476a;
-  --ink-3: #74779a;
-  --ink-4: #a4a7c2;
-  --rule: #dcdfec;
-  --rule-2: #c6cade;
-  --carbon: #3b2db3;
-  --carbon-2: #4f41d0;
-  --carbon-soft: #ebe8ff;
-  --carbon-ink: #2c2296;
-  --stamp: #cf2a3e;
-  --stamp-soft: #fde8eb;
-  --haldi: #e2a000;
-  --haldi-ink: #835600;
-  --haldi-soft: #fff3cc;
-  --neem: #0e7a54;
-  --neem-soft: #dcf2e7;
-  --duplicate: #fbe6ed;
-  --postcard: #fbf3dc;
-  --shadow-rgb: 22 23 58;
+  --sheet-2: #f5f9f8;
+  --ink: #0e1f1b;
+  --ink-2: #384b46;
+  --ink-3: #62756f;
+  --ink-4: #9aaca6;
+  --rule: #dae4e1;
+  --rule-2: #c1cfca;
+  --mor: #0a6c63;
+  --mor-2: #08594f;
+  --mor-soft: #d7efea;
+  --mor-ink: #07524b;
+  --genda: #ffb81c;
+  --genda-2: #f5a800;
+  --genda-soft: #fff1c9;
+  --genda-ink: #7a4b00;
+  --stamp: #d1342a;
+  --stamp-soft: #fde5e1;
+  --haldi: #e87010;
+  --haldi-ink: #a44700;
+  --haldi-soft: #fdead6;
+  --neem: #1a7d44;
+  --neem-soft: #daf1e3;
+  --duplicate: #ffefc4;
+  --postcard: #fbf0d2;
+  --on-mor: #ffffff;
+  --on-genda: #1d1400;
+  --shadow-rgb: 14 31 27;
 
-  --agent-sutradhar: #16173a;
-  --agent-munshi: #3b2db3;
-  --agent-gawah: #0b7a85;
-  --agent-chowkidar: #b97500;
-  --agent-dakiya: #cf2a3e;
-  --agent-khoji: #1d68ad;
+  --agent-sutradhar: #0e1f1b;
+  --agent-munshi: #0a6c63;
+  --agent-gawah: #2160b0;
+  --agent-chowkidar: #c46a00;
+  --agent-dakiya: #c9322a;
+  --agent-khoji: #3d8424;
 
   color-scheme: light;
 }
 
 [data-theme="dark"] {
-  --paper: #0d0e20;
-  --paper-deep: #080917;
-  --sheet: #161830;
-  --sheet-2: #1b1d39;
-  --ink: #ecebfa;
-  --ink-2: #b7b8d6;
-  --ink-3: #8a8cb0;
-  --ink-4: #5d5f84;
-  --rule: #262949;
-  --rule-2: #35385e;
-  --carbon: #9488ff;
-  --carbon-2: #aaa1ff;
-  --carbon-soft: #262250;
-  --carbon-ink: #bbb4ff;
-  --stamp: #ff6474;
-  --stamp-soft: #3b1724;
-  --haldi: #f5c044;
-  --haldi-ink: #f5c044;
-  --haldi-soft: #342a10;
-  --neem: #44cf93;
-  --neem-soft: #0f2f24;
-  --duplicate: #2b1c30;
-  --postcard: #2a2516;
+  --paper: #0b1412;
+  --paper-deep: #060d0b;
+  --sheet: #121e1b;
+  --sheet-2: #162421;
+  --ink: #e7f0ed;
+  --ink-2: #b2c3be;
+  --ink-3: #82958f;
+  --ink-4: #556761;
+  --rule: #213230;
+  --rule-2: #2e4440;
+  --mor: #3ccab8;
+  --mor-2: #62d8c8;
+  --mor-soft: #11372f;
+  --mor-ink: #7fe2d4;
+  --genda: #ffc23a;
+  --genda-2: #ffcf5c;
+  --genda-soft: #382c0c;
+  --genda-ink: #ffd56e;
+  --stamp: #ff6a5d;
+  --stamp-soft: #3a1915;
+  --haldi: #ff9a3f;
+  --haldi-ink: #ffb26b;
+  --haldi-soft: #38230f;
+  --neem: #4bd488;
+  --neem-soft: #0e2f1f;
+  --duplicate: #2c2713;
+  --postcard: #29241a;
+  --on-mor: #04130f;
+  --on-genda: #1d1400;
   --shadow-rgb: 0 0 0;
 
-  --agent-sutradhar: #ecebfa;
-  --agent-munshi: #9d92ff;
-  --agent-gawah: #3cc3cf;
-  --agent-chowkidar: #f0b43a;
-  --agent-dakiya: #ff6474;
-  --agent-khoji: #5aa6ef;
+  --agent-sutradhar: #e7f0ed;
+  --agent-munshi: #3ccab8;
+  --agent-gawah: #5ea2ef;
+  --agent-chowkidar: #f2a93b;
+  --agent-dakiya: #ff6a5d;
+  --agent-khoji: #8fd463;
 
   color-scheme: dark;
 }
@@ -90,10 +104,14 @@
   --color-ink-4: var(--ink-4);
   --color-rule: var(--rule);
   --color-rule-2: var(--rule-2);
-  --color-carbon: var(--carbon);
-  --color-carbon-2: var(--carbon-2);
-  --color-carbon-soft: var(--carbon-soft);
-  --color-carbon-ink: var(--carbon-ink);
+  --color-mor: var(--mor);
+  --color-mor-2: var(--mor-2);
+  --color-mor-soft: var(--mor-soft);
+  --color-mor-ink: var(--mor-ink);
+  --color-genda: var(--genda);
+  --color-genda-2: var(--genda-2);
+  --color-genda-soft: var(--genda-soft);
+  --color-genda-ink: var(--genda-ink);
   --color-stamp: var(--stamp);
   --color-stamp-soft: var(--stamp-soft);
   --color-haldi: var(--haldi);
@@ -103,6 +121,8 @@
   --color-neem-soft: var(--neem-soft);
   --color-duplicate: var(--duplicate);
   --color-postcard: var(--postcard);
+  --color-on-mor: var(--on-mor);
+  --color-on-genda: var(--on-genda);
 
   --font-sans: var(--font-hind), var(--font-anek-deva), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-anek), var(--font-anek-deva), ui-sans-serif, system-ui, sans-serif;
@@ -110,8 +130,8 @@
   --font-hand: var(--font-kalam), cursive;
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 
-  --shadow-sheet: 0 1px 0 rgb(var(--shadow-rgb) / 0.04), 0 1px 2px rgb(var(--shadow-rgb) / 0.06), 0 8px 24px -12px rgb(var(--shadow-rgb) / 0.18);
-  --shadow-lift: 0 2px 4px rgb(var(--shadow-rgb) / 0.06), 0 18px 40px -16px rgb(var(--shadow-rgb) / 0.32);
+  --shadow-sheet: 0 1px 0 rgb(var(--shadow-rgb) / 0.03), 0 1px 2px rgb(var(--shadow-rgb) / 0.05), 0 10px 28px -16px rgb(var(--shadow-rgb) / 0.2);
+  --shadow-lift: 0 2px 4px rgb(var(--shadow-rgb) / 0.05), 0 22px 44px -18px rgb(var(--shadow-rgb) / 0.3);
 }
 
 html {
@@ -128,25 +148,26 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Fine paper grain over the whole app. */
+/* A faint dot grid, like the squared paper in a trader's rough book. */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.5;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.09  0 0 0 0 0.09  0 0 0 0 0.23  0 0 0 0.035 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-image: radial-gradient(circle, color-mix(in oklab, var(--ink) 9%, transparent) 1px, transparent 1.2px);
+  background-size: 22px 22px;
+  mask-image: linear-gradient(to bottom, #000, transparent 70%);
 }
 
 @layer base {
   ::selection {
-    background: var(--carbon-soft);
-    color: var(--carbon-ink);
+    background: var(--genda-soft);
+    color: var(--ink);
   }
 
   :focus-visible {
-    outline: 2px solid var(--carbon);
+    outline: 2px solid var(--mor);
     outline-offset: 2px;
     border-radius: 6px;
   }
@@ -156,13 +177,20 @@ body::before {
 /* ---------- Type helpers ---------- */
 .display {
   font-family: var(--font-display);
-  font-stretch: 88%;
-  letter-spacing: -0.01em;
+  font-stretch: 100%;
+  letter-spacing: -0.015em;
 }
 .display-tight {
   font-family: var(--font-display);
-  font-stretch: 75%;
+  font-stretch: 82%;
   letter-spacing: -0.02em;
+}
+/* Signboard weight: wide and heavy, for the few words that should shout. */
+.display-wide {
+  font-family: var(--font-display);
+  font-stretch: 112%;
+  font-weight: 800;
+  letter-spacing: -0.025em;
 }
 .eyebrow {
   font-family: var(--font-sans);
@@ -174,10 +202,20 @@ body::before {
 }
 .hand {
   font-family: var(--font-hand);
-  color: var(--carbon-ink);
+  color: var(--mor-ink);
 }
 .tabular {
   font-variant-numeric: tabular-nums;
+}
+/* A marigold highlighter stroke behind a word. */
+.marker {
+  background-image: linear-gradient(100deg, transparent 0.2em, color-mix(in oklab, var(--genda) 70%, transparent) 0.25em, color-mix(in oklab, var(--genda) 55%, transparent) calc(100% - 0.2em), transparent calc(100% - 0.15em));
+  background-size: 100% 0.42em;
+  background-position: 0 88%;
+  background-repeat: no-repeat;
+  padding: 0 0.08em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 /* ---------- Register surfaces ---------- */
@@ -187,8 +225,8 @@ body::before {
     to bottom,
     transparent 0,
     transparent 35px,
-    color-mix(in oklab, var(--carbon) 11%, transparent) 35px,
-    color-mix(in oklab, var(--carbon) 11%, transparent) 36px
+    color-mix(in oklab, var(--mor) 10%, transparent) 35px,
+    color-mix(in oklab, var(--mor) 10%, transparent) 36px
   );
 }
 .margin-line {
@@ -201,7 +239,7 @@ body::before {
   bottom: 0;
   left: var(--margin-x, 56px);
   width: 1.5px;
-  background: color-mix(in oklab, var(--stamp) 55%, transparent);
+  background: color-mix(in oklab, var(--stamp) 50%, transparent);
 }
 .dotted-under {
   background-image: linear-gradient(to right, var(--rule-2) 40%, transparent 0);
@@ -231,16 +269,45 @@ body::before {
 .sheet {
   background: var(--sheet);
   border: 1px solid var(--rule);
-  border-radius: 16px;
+  border-radius: 20px;
   box-shadow: var(--shadow-sheet);
 }
 
+/* Small pill toggles used for tabs and filters */
+.seg {
+  display: inline-flex;
+  gap: 2px;
+  border-radius: 999px;
+  background: var(--paper-deep);
+  padding: 4px;
+}
+.seg > button {
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink-3);
+  transition: background 0.15s, color 0.15s;
+}
+.seg > button:hover {
+  color: var(--ink);
+}
+.seg > button[aria-selected="true"],
+.seg > button[aria-pressed="true"] {
+  background: var(--sheet);
+  color: var(--ink);
+  box-shadow: var(--shadow-sheet);
+}
 }
 
 /* ---------- Motion ---------- */
 @keyframes pulse-ring {
-  0% { transform: scale(1); opacity: 0.5; }
+  0% { transform: scale(1); opacity: 0.55; }
   100% { transform: scale(1.9); opacity: 0; }
+}
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 0.55; }
+  50% { transform: scale(1.14); opacity: 0.2; }
 }
 @keyframes blink {
   50% { opacity: 0.25; }
@@ -261,6 +328,10 @@ body::before {
   60% { opacity: 1; transform: scale(0.85); }
   100% { opacity: 1; transform: scale(1); }
 }
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
 .writing-dot {
   animation: blink 1s ease-in-out infinite;
 }
@@ -268,7 +339,7 @@ body::before {
   background: linear-gradient(90deg, var(--paper-deep) 25%, var(--sheet-2) 50%, var(--paper-deep) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.4s linear infinite;
-  border-radius: 8px;
+  border-radius: 10px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -281,12 +352,11 @@ body::before {
   }
 }
 
-/* Scrollbars that belong on paper */
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--rule-2) transparent;
 }
 
 input[type="range"] {
-  accent-color: var(--carbon);
+  accent-color: var(--mor);
 }

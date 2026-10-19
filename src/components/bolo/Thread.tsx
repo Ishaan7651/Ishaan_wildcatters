@@ -16,7 +16,7 @@ export function Thread({ today }: { today: string }) {
   // Each business sees its own conversation; switching back brings it back.
   const turns = all.filter((t) => t.actorId === actorId);
   return (
-    <div className="space-y-5">
+    <div className="space-y-9">
       <AnimatePresence initial={false}>
         {turns.map((t) => (
           <motion.div
@@ -38,13 +38,15 @@ export function Thread({ today }: { today: string }) {
 function TurnCard({ turn, today }: { turn: Turn; today: string }) {
   return (
     <article className="relative">
-      <div className="flex items-start gap-3 px-1">
-        <span className="mt-1.5 grid size-6 shrink-0 place-items-center rounded-full bg-paper-deep text-ink-3" title={turn.source === "voice" ? "Spoken" : "Typed"}>
-          {turn.source === "voice" ? <Mic size={13} /> : <Keyboard size={13} />}
+      <div className="flex items-start gap-3">
+        <span className="mt-1 grid size-8 shrink-0 place-items-center rounded-full bg-genda text-on-genda" title={turn.source === "voice" ? "Spoken" : "Typed"}>
+          {turn.source === "voice" ? <Mic size={15} strokeWidth={2.3} /> : <Keyboard size={15} />}
         </span>
-        <p className="hand min-w-0 flex-1 text-[20px] leading-snug sm:text-[22px]">“{turn.utterance}”</p>
+        <div className="min-w-0 rounded-[18px] rounded-tl-md border border-genda/40 bg-genda-soft px-4 py-2 shadow-[var(--shadow-sheet)]">
+          <p className="hand text-[20px] leading-snug text-ink sm:text-[22px]">{turn.utterance}</p>
+        </div>
       </div>
-      <div className="mt-2 ml-4 border-l-[1.5px] border-stamp/40 pb-1 pl-5 sm:ml-[11px]">
+      <div className="mt-3 ml-[15px] border-l-2 border-dashed border-rule-2 pb-1 pl-6">
         <AgentTrace turn={turn} />
         {turn.status === "error" && (
           <p className="mt-3 rounded-xl border border-stamp/30 bg-stamp-soft px-4 py-3 text-[14px] text-ink">{turn.error}</p>
@@ -67,11 +69,11 @@ function AgentTrace({ turn }: { turn: Turn }) {
   if (!chain.length) chain.push("sutradhar");
   const showSteps = running || open;
   return (
-    <div className="rounded-2xl border border-rule bg-sheet-2/70 px-3.5 py-2.5">
+    <div className={clsx("rounded-2xl border px-3.5 py-2.5 transition-colors", running ? "border-mor/30 bg-mor-soft/40" : "border-rule bg-sheet/80")}>
       <button onClick={() => !running && setOpen((o) => !o)} className="flex w-full flex-wrap items-center gap-x-2 gap-y-1 text-left" aria-expanded={showSteps}>
         {chain.map((a, i) => (
           <span key={i} className="flex items-center gap-1.5">
-            {i > 0 && <span className="text-ink-4">→</span>}
+            {i > 0 && <span className="text-ink-4">⟶</span>}
             <AgentGlyph agent={a} size={22} className={clsx(running && i === chain.length - 1 && "animate-pulse")} />
             <span className="text-[13px] font-semibold text-ink">{AGENTS[a].title}</span>
           </span>

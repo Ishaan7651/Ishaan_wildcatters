@@ -31,7 +31,7 @@ export function AgingBar({ slip, today, className }: { slip: SlipView; today: st
     <div className={clsx("relative h-5", className)} aria-hidden>
       <div className="absolute inset-x-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-rule" />
       <div
-        className={clsx("absolute top-1/2 h-[3px] -translate-y-1/2 rounded-full", slip.phase === "due_soon" || slip.phase === "due_today" ? "bg-haldi" : "bg-carbon/70")}
+        className={clsx("absolute top-1/2 h-[3px] -translate-y-1/2 rounded-full", slip.phase === "due_soon" || slip.phase === "due_today" ? "bg-haldi" : "bg-mor/70")}
         style={{ left: 0, width: x(end < slip.dueDate ? end : slip.dueDate) }}
       />
       {overdue && (

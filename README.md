@@ -132,11 +132,17 @@ It's a standard Next.js 16 app. The lake is a file. On a host with a persistent 
 
 ## Design notes
 
-The look comes from the tools Indian traders actually use: the ruled **bahi-khata** register with its red margin line, **carbon-copy** receipt books (every slip is drawn as a two-ply *parchi* with a perforated counterfoil and a pink duplicate behind it), violet **rubber stamps**, and India Post **postcards** for reminders. Handwritten fields are set in *Kalam* (Indian Type Foundry), headings in *Anek* (Ek Type), body in *Hind*, data in *IBM Plex Mono*. Devanagari labels sit beside the English ones.
+The look comes from the bazaar itself. The palette is **peacock teal** (*mor*) for anything you can act on, **marigold** (*genda*) for the voice and the things worth noticing, **sindoor red** for late money, **neem green** for money that came home and **saffron** for "due soon". The shop-sign logo is a marigold tag. The tools are the ones traders actually use: the ruled **bahi-khata** register with its red margin line, **carbon-copy** receipt books (every slip is a two-ply *parchi* with a perforated counterfoil and a yellow duplicate behind it), **rubber stamps**, and India Post **postcards** for reminders. Handwritten fields are set in *Kalam* (Indian Type Foundry), headings in *Anek* (Ek Type) at signboard width, body in *Hind*, data in *IBM Plex Mono*. Devanagari labels sit beside the English ones.
 
-The signature element is the **score ring**: 100 marks around a seal, one per point. Each point lost is punched out in red and explained on hover, so the rule is visible rather than just stated.
+The signature element on the home page is the **taraazu**, a shop's balance scale. What you're owed sits in one pan and what you owe in the other, one coin per open slip and red coins for late ones. The beam tips toward the heavier side on a spring. Around it:
 
-Built responsive down to phones (bottom navigation with a centre mic, bottom-sheet drawers), with light and dark themes, visible keyboard focus and reduced-motion support.
+* **Score ring:** 100 marks around a seal, one per point. Each point lost is punched out in red and explained on hover, so the rule is visible rather than just stated.
+* **Money timeline:** every open slip as a bubble on a line through today. Owed-to-you floats above, owed-by-you hangs below, late is to the left, and bubble size is the amount.
+* **Stamp cards:** anything waiting for your word is a slip you can stamp. *Haan, sahi hai* slams the stamp down and the card leaves the pile.
+* **Hash chain:** the Data lake page draws the newest events as linked blocks, and *Verify every link* walks a light along the chain.
+* **Crew dock:** a corner pill shows which agent is working right now and opens the full diary.
+
+Built responsive down to phones (bottom navigation with a marigold centre mic, bottom-sheet drawers), with light and dark themes, visible keyboard focus and reduced-motion support. The screenshots above predate the current palette.
 
 ![Trust map](docs/screens/5-map.png)
 ![The agents](docs/screens/6-agents.png)

@@ -116,7 +116,7 @@ function SlipDraftResult({ turn, draft }: { turn: Turn; draft: SlipDraft }) {
                 <button
                   key={a.id}
                   onClick={() => setParty({ id: a.id, name: a.name, isNew: false })}
-                  className="rounded-full border border-rule-2 bg-sheet px-2.5 py-0.5 text-[12.5px] hover:border-carbon"
+                  className="rounded-full border border-rule-2 bg-sheet px-2.5 py-0.5 text-[12.5px] hover:border-mor"
                 >
                   {a.name} <span className="text-ink-3">· {a.city}</span>
                 </button>
@@ -223,7 +223,7 @@ function PaymentResult({ turn, draft, today }: { turn: Turn; draft: PaymentDraft
               <button
                 key={c.id}
                 onClick={() => setChosen(c)}
-                className={clsx("rounded-full border px-3 py-1 text-[12.5px]", chosen?.id === c.id ? "border-carbon bg-carbon-soft" : "border-rule-2 bg-sheet hover:border-carbon")}
+                className={clsx("rounded-full border px-3 py-1 text-[12.5px]", chosen?.id === c.id ? "border-mor bg-mor-soft" : "border-rule-2 bg-sheet hover:border-mor")}
               >
                 {c.creditor.id === actorId ? c.debtor.name : c.creditor.name} · {rupees(c.amount)} · {c.code}
               </button>
@@ -235,7 +235,7 @@ function PaymentResult({ turn, draft, today }: { turn: Turn; draft: PaymentDraft
         <div className="flex flex-wrap items-end gap-3">
           <label className="text-[12px] text-ink-3">
             {iAmLender ? "Received on" : "Paid on"}
-            <input type="date" value={paidOn} max={today} onChange={(e) => setPaidOn(e.target.value)} className="hand mt-0.5 block rounded-xl border border-rule-2 bg-sheet px-3 py-1 text-[17px] text-carbon-ink" />
+            <input type="date" value={paidOn} max={today} onChange={(e) => setPaidOn(e.target.value)} className="hand mt-0.5 block rounded-xl border border-rule-2 bg-sheet px-3 py-1 text-[17px] text-mor-ink" />
           </label>
           <Button
             variant="primary"
@@ -264,7 +264,7 @@ function AnswerResult({ speech, cards, followUps, today }: { speech: string; car
         <AgentGlyph agent="khoji" size={30} />
         <div className="min-w-0 flex-1">
           <p className="text-[16.5px] leading-relaxed text-ink">{speech}</p>
-          <button onClick={() => speak(speech)} className="mt-1 inline-flex items-center gap-1.5 text-[12px] font-medium text-ink-3 hover:text-carbon">
+          <button onClick={() => speak(speech)} className="mt-1 inline-flex items-center gap-1.5 text-[12px] font-medium text-ink-3 hover:text-mor">
             <Volume2 size={13} /> Read aloud
           </button>
         </div>
@@ -275,7 +275,7 @@ function AnswerResult({ speech, cards, followUps, today }: { speech: string; car
       {followUps.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {followUps.map((f) => (
-            <button key={f} onClick={() => ask(f)} className="rounded-full border border-rule-2 bg-sheet px-3 py-1 text-[13px] text-ink-2 hover:border-carbon hover:text-ink">
+            <button key={f} onClick={() => ask(f)} className="rounded-full border border-rule-2 bg-sheet px-3 py-1 text-[13px] text-ink-2 hover:border-mor hover:text-ink">
               {f}
             </button>
           ))}
@@ -450,7 +450,7 @@ function MessageResult({ text, suggestions }: { text: string; suggestions: strin
       </div>
       <div className="flex flex-wrap gap-1.5">
         {suggestions.map((s) => (
-          <button key={s} onClick={() => ask(s)} className="hand rounded-full border border-rule-2 bg-sheet px-3 py-1 text-[15px] hover:border-carbon">
+          <button key={s} onClick={() => ask(s)} className="hand rounded-full border border-rule-2 bg-sheet px-3 py-1 text-[15px] hover:border-mor">
             {s}
           </button>
         ))}

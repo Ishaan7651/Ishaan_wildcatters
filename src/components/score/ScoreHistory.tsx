@@ -46,12 +46,12 @@ export function ScoreHistory({ points, height = 180 }: { points: { day: string; 
           <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full overflow-visible">
             <defs>
               <linearGradient id="score-fill" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0" stopColor="var(--carbon)" stopOpacity="0.18" />
-                <stop offset="1" stopColor="var(--carbon)" stopOpacity="0" />
+                <stop offset="0" stopColor="var(--mor)" stopOpacity="0.18" />
+                <stop offset="1" stopColor="var(--mor)" stopOpacity="0" />
               </linearGradient>
             </defs>
             <path d={area} fill="url(#score-fill)" />
-            <path d={path} fill="none" stroke="var(--carbon)" strokeWidth="2" vectorEffect="non-scaling-stroke" strokeLinejoin="round" />
+            <path d={path} fill="none" stroke="var(--mor)" strokeWidth="2" vectorEffect="non-scaling-stroke" strokeLinejoin="round" />
           </svg>
           {drops.map((p, i) => (
             <button
@@ -73,7 +73,7 @@ export function ScoreHistory({ points, height = 180 }: { points: { day: string; 
               <b className="text-stamp">{drops[hover].prev} → {drops[hover].score}</b> · {prettyDay(drops[hover].day)}
             </div>
           )}
-          <div className="absolute -right-1 size-3 translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-sheet bg-carbon" style={{ top: `${y(points[points.length - 1].score)}%` }} />
+          <div className="absolute -right-1 size-3 translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-sheet bg-mor" style={{ top: `${y(points[points.length - 1].score)}%` }} />
         </div>
         <div className="relative mt-1.5 h-4">
           {ticks.map((t) => (

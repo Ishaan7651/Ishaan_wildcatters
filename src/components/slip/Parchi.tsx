@@ -15,7 +15,7 @@ export interface Signature {
 }
 
 /**
- * The parchi — a two-ply carbon slip with a counterfoil. Every debt on Saakh
+ * The parchi — a two-ply mor slip with a counterfoil. Every debt on Saakh
  * is drawn as one. Fields can be swapped for inputs when it's a draft.
  */
 export function Parchi({
@@ -57,7 +57,7 @@ export function Parchi({
 }) {
   return (
     <div className={clsx("relative", className)}>
-      {/* the carbon duplicate peeking out behind */}
+      {/* the mor duplicate peeking out behind */}
       <div
         aria-hidden
         className="parchi-notch absolute inset-0 translate-x-[7px] translate-y-[7px] rotate-[0.7deg] rounded-[18px] border border-rule bg-duplicate"
@@ -140,7 +140,7 @@ function SignatureBox({ sig, role }: { sig: Signature; role: string }) {
       <div className="eyebrow flex items-center justify-between !text-[10px]">
         <span>
           {role}
-          {sig.you && <span className="ml-1 text-carbon">· you</span>}
+          {sig.you && <span className="ml-1 text-mor">· you</span>}
         </span>
       </div>
       <div className="mt-0.5 truncate text-[13px] font-medium text-ink">{sig.name}</div>
@@ -153,7 +153,7 @@ function SignatureBox({ sig, role }: { sig: Signature; role: string }) {
         )}
         {sig.state === "pending" && (
           <span className="flex items-center gap-1.5 text-ink-3">
-            <span className="size-1.5 rounded-full bg-carbon writing-dot" /> waiting for their word
+            <span className="size-1.5 rounded-full bg-mor writing-dot" /> waiting for their word
           </span>
         )}
         {sig.state === "refused" && (

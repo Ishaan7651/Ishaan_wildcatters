@@ -1,19 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "motion/react";
-import { PenLine } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import type { AppState } from "@/lib/shared/types";
 import { weekdayDay } from "@/lib/shared/dates";
 import { rupees } from "@/lib/shared/money";
-import { BAND_META } from "@/lib/shared/score";
-import { useAppState } from "@/lib/client/api";
+import { useAppState, useSlips } from "@/lib/client/api";
 import { useApp } from "@/components/providers/Providers";
 import { BoloBar } from "@/components/bolo/BoloBar";
 import { Thread } from "@/components/bolo/Thread";
-import { NeedsYou } from "@/components/home/NeedsYou";
+import { HowItWorks } from "@/components/home/HowItWorks";
+import { MoneyTimeline } from "@/components/home/MoneyTimeline";
+import { Taraazu } from "@/components/home/Taraazu";
+import { WaitingCards, waitingItems } from "@/components/home/WaitingCards";
 import { ScoreRing } from "@/components/score/ScoreRing";
-import { Button, Ticker } from "@/components/ui/primitives";
+import { BandPill, SectionTitle } from "@/components/ui/primitives";
 
 function examplesFor(s: AppState | undefined): string[] {
   const me = s?.me.business.id;
@@ -29,93 +30,184 @@ function examplesFor(s: AppState | undefined): string[] {
 }
 
 export default function BoloPage() {
-  const { actorId, ask, turns: allTurns, openComposer } = useApp();
+  const { actorId, turns: allTurns } = useApp();
   const turns = allTurns.filter((t) => t.actorId === actorId);
   const { data: s } = useAppState(actorId);
+  const { data: slips } = useSlips(actorId);
   const examples = examplesFor(s);
-  const first = s?.me.business.owner.split(" ")[0];
+  const waiting = s ? waitingItems(s).length : 0;
 
   return (
-    <div className="mx-auto max-w-[820px]">
-      <header className="flex items-end justify-between gap-5 pb-6 sm:pt-4">
-        <div className="min-w-0">
-          <p className="eyebrow">{s ? `${weekdayDay(s.clock.today)} · ${s.me.business.name}` : " "}</p>
-          <h1 className="display mt-2 text-[34px] leading-[1.02] font-semibold tracking-tight text-ink sm:text-[46px]">
-            {first ? (
+    <div className="mx-auto max-w-[1240px]">
+      <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_350px] xl:gap-10">
+        <div className="min-w-0 space-y-8">
+          <Greeting s={s} />
+          <BoloBar examples={examples} />
+
+          {s && (
+            <div className="grid gap-4 md:grid-cols-2 xl:hidden">
+              <ScoreCard s={s} />
+              <ScaleCard s={s} />
+            </div>
+          )}
+
+          {turns.length > 0 ? (
+            <section aria-label="Conversation">
+              <Thread today={s?.clock.today ?? ""} />
+            </section>
+          ) : (
+            <HowItWorks />
+          )}
+
+          {s && (
+            <section aria-label="Waiting for your word">
+              <SectionTitle
+                count={waiting}
+                hindi="आपकी हाँ चाहिए"
+                action={waiting > 0 ? <Link href="/inbox" className="flex items-center gap-1 text-[13px] font-semibold text-mor hover:underline">Inbox <ArrowRight size={14} /></Link> : null}
+              >
+                Waiting for your word
+              </SectionTitle>
+              <WaitingCards state={s} />
+            </section>
+          )}
+
+          {s && (
+            <section aria-label="Your money by due date" className="sheet p-4 sm:p-6">
+              <SectionTitle
+                hindi="हिसाब"
+                action={<Link href="/bahi" className="flex items-center gap-1 text-[13px] font-semibold text-mor hover:underline">Ledger <ArrowRight size={14} /></Link>}
+              >
+                Your money, by due date
+              </SectionTitle>
+              {slips ? (
+                slips.some((x) => x.status === "confirmed") ? (
+                  <MoneyTimeline slips={slips} actorId={actorId} />
+                ) : (
+                  <p className="py-8 text-center text-[14px] text-ink-3">No open slips. Say one above and it shows up here.</p>
+                )
+              ) : (
+                <div className="h-64 skeleton" />
+              )}
+            </section>
+          )}
+        </div>
+
+        <aside className="hidden xl:block" aria-label="Your shop at a glance">
+          <div className="sticky top-[88px] space-y-5">
+            {s ? (
               <>
-                Namaste, {first}.
-                <span className="block text-ink-3">Who owes whom today?</span>
+                <ScoreCard s={s} />
+                <ScaleCard s={s} />
               </>
             ) : (
-              <span className="block h-[92px] w-72 skeleton" />
+              <>
+                <div className="h-64 skeleton" />
+                <div className="h-80 skeleton" />
+              </>
             )}
-          </h1>
-        </div>
-        {s && (
-          <Link href={`/b/${s.me.business.id}`} className="group hidden shrink-0 items-center gap-3 rounded-2xl p-2 pr-3 hover:bg-sheet sm:flex">
-            <ScoreRing score={s.me.score.score} band={s.me.score.band} penalties={s.me.score.penalties} size={84} />
-            <span className="text-left">
-              <span className="eyebrow block">Your Saakh</span>
-              <span className="display block text-[17px] font-semibold text-ink">{BAND_META[s.me.score.band].label}</span>
-              <span className="block text-[12px] text-ink-3 group-hover:text-carbon">See your record →</span>
-            </span>
-          </Link>
-        )}
-      </header>
-
-      <BoloBar examples={examples} />
-
-      {turns.length === 0 && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mt-7 flex flex-wrap items-center gap-2">
-          <span className="eyebrow mr-1">Try</span>
-          {examples.slice(0, 4).map((e) => (
-            <button
-              key={e}
-              onClick={() => ask(e)}
-              className="hand max-w-full truncate rounded-full border border-rule-2 bg-sheet px-3.5 py-1 text-left text-[15px] text-carbon-ink transition-colors hover:border-carbon hover:bg-carbon-soft/50"
-            >
-              {e}
-            </button>
-          ))}
-          <Button variant="ghost" size="sm" onClick={() => openComposer({})}>
-            <PenLine size={14} /> Write one by hand
-          </Button>
-        </motion.div>
-      )}
-
-      {turns.length > 0 && (
-        <section className="mt-9" aria-label="Conversation">
-          <Thread today={s?.clock.today ?? ""} />
-        </section>
-      )}
-
-      {s && (
-        <>
-          <section className="mt-12" aria-label="Your money">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <Money label="Owed to you" hindi="लेना" amount={s.me.stats.owed.amount} sub={`${s.me.stats.owed.count} slip${s.me.stats.owed.count === 1 ? "" : "s"}${s.me.stats.owed.overdueCount ? ` · ${s.me.stats.owed.overdueCount} overdue` : ""}`} tone={s.me.stats.owed.overdueCount ? "bad" : "neutral"} />
-              <Money label="You owe" hindi="देना" amount={s.me.stats.owes.amount} sub={`${s.me.stats.owes.count} slip${s.me.stats.owes.count === 1 ? "" : "s"}${s.me.stats.owes.overdueCount ? ` · ${s.me.stats.owes.overdueCount} overdue` : ""}`} tone={s.me.stats.owes.overdueCount ? "bad" : "neutral"} />
-              <Money label="Net" hindi="बाकी" amount={s.me.stats.owed.amount - s.me.stats.owes.amount} sub="owed to you minus what you owe" tone="neutral" signed />
-            </div>
-          </section>
-          <NeedsYou state={s} />
-        </>
-      )}
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }
 
-function Money({ label, hindi, amount, sub, tone, signed }: { label: string; hindi: string; amount: number; sub: string; tone: "bad" | "neutral"; signed?: boolean }) {
+function Greeting({ s }: { s: AppState | undefined }) {
+  if (!s)
+    return (
+      <div className="space-y-3 sm:pt-2">
+        <div className="h-4 w-48 skeleton" />
+        <div className="h-12 w-80 skeleton" />
+      </div>
+    );
+  const first = s.me.business.owner.split(" ")[0];
+  const waiting = waitingItems(s).length;
+  const lateToMe = s.overdueToMe.reduce((a, x) => a + x.amount, 0);
+  const iOweSoon = s.dueSoon.length;
+  const bits: React.ReactNode[] = [];
+  if (waiting) bits.push(<><b className="marker text-ink">{waiting} slip{waiting === 1 ? "" : "s"}</b> need{waiting === 1 ? "s" : ""} your yes</>);
+  if (lateToMe) bits.push(<><b className="text-stamp">{rupees(lateToMe)}</b> is late coming to you</>);
+  if (iOweSoon) bits.push(<>{bits.length ? "you" : "You"} have <b className="text-ink">{iOweSoon} payment{iOweSoon === 1 ? "" : "s"}</b> due this week</>);
+
   return (
-    <div className="sheet px-5 py-4">
-      <p className="eyebrow flex items-center justify-between">
-        {label} <span className="font-deva text-[12px] tracking-normal text-ink-4 normal-case">{hindi}</span>
+    <header className="sm:pt-2">
+      <p className="text-[13px] font-medium text-ink-3">
+        {weekdayDay(s.clock.today)} · {s.me.business.name}, {s.me.business.city}
       </p>
-      <p className="display mt-1 text-[30px] leading-none font-semibold text-ink">
-        {signed && amount > 0 ? "+" : signed && amount < 0 ? "−" : ""}
-        <Ticker value={Math.abs(amount)} format={(n) => rupees(n)} />
+      <h1 className="display-wide mt-1 text-[34px] leading-[1.05] text-ink sm:text-[46px]">Namaste, {first}.</h1>
+      <p className="mt-2 max-w-[640px] text-[16px] leading-snug text-ink-2 sm:text-[17px]">
+        {bits.length ? (
+          bits.map((b, i) => (
+            <span key={i}>
+              {i > 0 && (i === bits.length - 1 ? " and " : ", ")}
+              {b}
+            </span>
+          ))
+        ) : (
+          <>All clear today. Say a new slip, or ask about anyone in the market.</>
+        )}
+        {bits.length > 0 && "."}
       </p>
-      <p className={tone === "bad" ? "mt-1.5 text-[12.5px] text-stamp" : "mt-1.5 text-[12.5px] text-ink-3"}>{sub}</p>
-    </div>
+    </header>
+  );
+}
+
+function ScoreCard({ s }: { s: AppState }) {
+  const sc = s.me.score;
+  const unpaid = sc.penalties.filter((p) => !p.settled).length;
+  return (
+    <Link href={`/b/${s.me.business.id}`} className="sheet group block p-5 transition-shadow hover:shadow-[var(--shadow-lift)]">
+      <div className="flex items-center justify-between gap-2">
+        <p className="eyebrow">Your Saakh score</p>
+        <BandPill band={sc.band} withHindi />
+      </div>
+      <div className="mt-3 flex items-center gap-4">
+        <ScoreRing score={sc.score} band={sc.band} penalties={sc.penalties} size={128} />
+        <div className="min-w-0 text-[13.5px] leading-snug text-ink-2">
+          {sc.pointsLost === 0 ? (
+            <p>
+              <b className="text-ink">A perfect record.</b> Every debt you owed was paid on time.
+            </p>
+          ) : (
+            <p>
+              <b className="text-ink">
+                {sc.pointsLost} point{sc.pointsLost === 1 ? "" : "s"} lost
+              </b>{" "}
+              to late payments.{" "}
+              {unpaid ? (
+                <span className="text-stamp">
+                  {unpaid === sc.pointsLost ? "All" : unpaid} still unpaid, and the next one drops at the start of the month.
+                </span>
+              ) : (
+                "All since paid — the record stays."
+              )}
+            </p>
+          )}
+        </div>
+      </div>
+      <div className="mt-4 flex items-center justify-between border-t border-rule pt-3 text-[12.5px]">
+        <span className="text-ink-3">
+          1 late month = <b className="text-stamp">−1 point</b>
+        </span>
+        <span className="flex items-center gap-1 font-semibold text-mor group-hover:underline">
+          Your record <ArrowRight size={13} />
+        </span>
+      </div>
+    </Link>
+  );
+}
+
+function ScaleCard({ s }: { s: AppState }) {
+  return (
+    <section className="sheet p-5" aria-label="Your balance">
+      <div className="flex items-baseline justify-between">
+        <p className="eyebrow">Your taraazu</p>
+        <span className="font-deva text-[12px] text-ink-4">तराज़ू</span>
+      </div>
+      <div className="mt-2">
+        <Taraazu stats={s.me.stats} />
+      </div>
+    </section>
   );
 }

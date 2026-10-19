@@ -32,7 +32,7 @@ export function Postcard({
   const t = TONE[tone] ?? TONE.gentle;
   return (
     <div className="relative overflow-hidden rounded-2xl border border-[color-mix(in_oklab,var(--haldi)_35%,var(--rule))] bg-postcard shadow-[var(--shadow-sheet)]">
-      <div className="h-1.5" style={{ background: `repeating-linear-gradient(135deg, var(--stamp) 0 10px, transparent 10px 20px, var(--carbon) 20px 30px, transparent 30px 40px)` }} />
+      <div className="h-1.5" style={{ background: `repeating-linear-gradient(135deg, var(--stamp) 0 10px, transparent 10px 20px, var(--mor) 20px 30px, transparent 30px 40px)` }} />
       <div className={clsx("grid gap-4", compact ? "grid-cols-[1fr_auto] p-3.5" : "grid-cols-[1fr_auto] p-4 sm:p-5")}>
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">

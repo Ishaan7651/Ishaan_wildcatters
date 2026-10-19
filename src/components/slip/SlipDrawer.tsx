@@ -131,16 +131,16 @@ function SlipDetail({ slip, today }: { slip: SlipView; today: string }) {
       {/* Actions for whoever is looking */}
       <div className="space-y-3">
         {iConfirm && mode !== "dispute" && (
-          <div className="rounded-2xl border border-carbon/25 bg-carbon-soft/60 p-4">
+          <div className="rounded-2xl border border-mor/25 bg-mor-soft/60 p-4">
             <p className="text-[14px] text-ink">
               <b>{slip.raisedBy === "creditor" ? slip.creditor.name : slip.debtor.name}</b> wrote this slip. Nothing counts until you agree.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Button variant="primary" loading={busy === "confirm"} onClick={() => run(slip, "confirm", {}, "Stamped — it's on record for both of you")}>
-                <Check size={16} /> Yes, that&apos;s right
+                <Check size={16} /> Haan, sahi hai
               </Button>
               <Button variant="danger" onClick={() => setMode("dispute")}>
-                <MessageCircleWarning size={16} /> No / different amount
+                <MessageCircleWarning size={16} /> Nahi — something&apos;s wrong
               </Button>
             </div>
           </div>
@@ -155,7 +155,7 @@ function SlipDetail({ slip, today }: { slip: SlipView; today: string }) {
               onChange={(e) => setReason(e.target.value)}
               rows={2}
               placeholder="e.g. 2 kg came back damaged"
-              className="mt-1.5 w-full resize-none rounded-xl border border-rule-2 bg-sheet-2 px-3 py-2 text-[14px] outline-none focus:border-carbon"
+              className="mt-1.5 w-full resize-none rounded-xl border border-rule-2 bg-sheet-2 px-3 py-2 text-[14px] outline-none focus:border-mor"
             />
             <label className="eyebrow mt-3 block" htmlFor="counter">The right amount (optional)</label>
             <div className="mt-1.5 flex items-center gap-2">
@@ -166,7 +166,7 @@ function SlipDetail({ slip, today }: { slip: SlipView; today: string }) {
                 value={counter}
                 onChange={(e) => setCounter(e.target.value.replace(/[^\d]/g, ""))}
                 placeholder={String(slip.amount)}
-                className="hand w-40 rounded-xl border border-rule-2 bg-sheet-2 px-3 py-1.5 text-[20px] outline-none focus:border-carbon"
+                className="hand w-40 rounded-xl border border-rule-2 bg-sheet-2 px-3 py-1.5 text-[20px] outline-none focus:border-mor"
               />
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -223,16 +223,16 @@ function SlipDetail({ slip, today }: { slip: SlipView; today: string }) {
         )}
 
         {paymentPending && iAmLender && (
-          <div className="rounded-2xl border border-carbon/25 bg-carbon-soft/60 p-4">
+          <div className="rounded-2xl border border-mor/25 bg-mor-soft/60 p-4">
             <p className="text-[14px] text-ink">
               <b>{slip.debtor.name}</b> says they paid {rupees(slip.amount)} on {prettyDay(slip.payment!.paidOn)}. Did it reach you?
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Button variant="primary" loading={busy === "ack_payment"} onClick={() => run(slip, "ack_payment", {}, "Payment confirmed — slip closed")}>
-                <Check size={16} /> Yes, received
+                <Check size={16} /> Haan, mil gaya
               </Button>
               <Button variant="danger" loading={busy === "reject_payment"} onClick={() => run(slip, "reject_payment", {}, "Told them it hasn't arrived")}>
-                <CircleSlash size={16} /> Not received
+                <CircleSlash size={16} /> Nahi mila
               </Button>
             </div>
           </div>
@@ -255,7 +255,7 @@ function SlipDetail({ slip, today }: { slip: SlipView; today: string }) {
                     value={paidOn}
                     max={today}
                     onChange={(e) => setPaidOn(e.target.value)}
-                    className="hand mt-1 block rounded-xl border border-rule-2 bg-sheet-2 px-3 py-1.5 text-[18px] outline-none focus:border-carbon"
+                    className="hand mt-1 block rounded-xl border border-rule-2 bg-sheet-2 px-3 py-1.5 text-[18px] outline-none focus:border-mor"
                   />
                 </div>
                 <Button
@@ -324,9 +324,9 @@ function SlipDetail({ slip, today }: { slip: SlipView; today: string }) {
         {handOff && (
           <button
             onClick={() => setActor(handOff.id)}
-            className="flex w-full items-center gap-3 rounded-2xl border border-dashed border-rule-2 px-4 py-3 text-left text-[13px] text-ink-2 hover:border-carbon hover:text-ink"
+            className="flex w-full items-center gap-3 rounded-2xl border border-dashed border-rule-2 px-4 py-3 text-left text-[13px] text-ink-2 hover:border-mor hover:text-ink"
           >
-            <ArrowLeftRight size={16} className="shrink-0 text-carbon" />
+            <ArrowLeftRight size={16} className="shrink-0 text-mor" />
             <span>
               <b className="text-ink">Demo:</b> switch to <b className="text-ink">{handOff.name}</b> to answer this from their side.
             </span>
@@ -353,7 +353,7 @@ function SlipDetail({ slip, today }: { slip: SlipView; today: string }) {
               <span
                 className={clsx(
                   "absolute top-1.5 -left-[5px] size-[9px] rounded-full border-2 border-paper",
-                  t.kind === "penalty" ? "bg-stamp" : t.kind === "confirmed" || t.kind === "paid" ? "bg-neem" : t.kind === "reminder" ? "bg-haldi" : "bg-carbon",
+                  t.kind === "penalty" ? "bg-stamp" : t.kind === "confirmed" || t.kind === "paid" ? "bg-neem" : t.kind === "reminder" ? "bg-haldi" : "bg-mor",
                 )}
               />
               <p className="text-[14px] text-ink">{t.text}</p>
