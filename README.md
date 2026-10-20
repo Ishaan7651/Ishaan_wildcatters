@@ -83,7 +83,7 @@ flowchart LR
   CH -- hand-off --> D
 ```
 
-* **Event sourcing.** [`store.ts`](src/lib/server/store.ts) appends events to `lake.jsonl`. Each one carries `hash = sha256(prev ‖ seq, type, at, actor, data)`, so changing any past event breaks every hash after it. `/api/lake/verify` re-hashes the whole chain.
+* **Event sourcing.** [`store.ts`](src/lib/server/store.ts) appends events to `lake.jsonl`, or to Postgres when `DATABASE_URL` is set. Each one carries `hash = sha256(prev ‖ seq, type, at, actor, data)`, so changing any past event breaks every hash after it. `/api/lake/verify` re-hashes the whole chain.
 * **Projection.** [`project.ts`](src/lib/server/project.ts) folds the events into businesses and slips *as of* a moment, and [`views.ts`](src/lib/server/views.ts) derives scores, inboxes, profiles and the network graph.
 * **Time machine.** Because state is a fold "as of" the Saakh clock, moving the clock forward (or back) is just a different fold. Chowkidar patrols the new day and Dakiya sends reminders, so you can watch a month of non-payment happen in one click.
 * **Agent runtime.** [`runtime.ts`](src/lib/server/ai/runtime.ts) runs the tool-calling loop on OpenRouter's OpenAI-compatible API and records each step. The `/api/bolo` endpoint streams those steps to the browser as NDJSON, so you see the agents work live.
@@ -114,7 +114,7 @@ npm run dev                  # http://localhost:3000
 
 * The demo market (16 businesses across India, about 60 slips over ten months) is generated on first run, relative to today, so it always looks current. **Reset demo data** in the sidebar regenerates it.
 * There are no logins in this demo. Use the business switcher (top right) to act as any business; that's how you play both sides of a slip.
-* Optional settings (see `.env.example`): `SAAKH_MODEL`, `SAAKH_ROUTER_MODEL`, `SAAKH_AUDIO_MODEL`, `SAAKH_REASONING`, `SAAKH_DATA_DIR`.
+* Optional settings (see `.env.example`): `DATABASE_URL`, `SAAKH_MODEL`, `SAAKH_ROUTER_MODEL`, `SAAKH_AUDIO_MODEL`, `SAAKH_REASONING`, `SAAKH_DATA_DIR`, `SAAKH_PUBLIC_URL`.
 
 ### A two-minute demo
 
@@ -126,7 +126,21 @@ npm run dev                  # http://localhost:3000
 
 ### Deploying
 
-It's a standard Next.js 16 app. The lake is a file. On a host with a persistent disk (Railway, Render, Fly, a VM), point `SAAKH_DATA_DIR` at the volume. On Vercel it writes to `/tmp`, which works for a demo but resets on cold starts. Swapping `store.ts` for Postgres or object storage is a self-contained change, since everything else reads through the projection.
+It's a standard Next.js 16 app. The ledger lives in one of two places:
+
+* **No `DATABASE_URL`:** a file in `.data/` (or `SAAKH_DATA_DIR`). Good for local work and for hosts with a persistent disk (Railway, Render with a disk, a VM).
+* **`DATABASE_URL` set:** Postgres. Every server instance shares one ledger, which is what serverless hosts need. The tables are created and the demo market seeded on first request, in their own `saakh` schema with row-level security on, so Supabase's public REST API can't reach them.
+
+**Vercel + Supabase (both free):**
+
+1. Create a [Supabase](https://supabase.com) project in **South Asia (Mumbai)**, to sit next to the Vercel functions (`vercel.json` pins them to `bom1`, Mumbai).
+2. In Supabase, click **Connect** and copy the **Transaction pooler** connection string (port 6543), with your database password filled in.
+3. On [Vercel](https://vercel.com/new), import this repository. Under Environment Variables add `DATABASE_URL` (that string) and `OPENROUTER_API_KEY`. Optionally add `SAAKH_PUBLIC_URL` with the deployed address.
+4. Deploy. The first page load creates the tables and the demo market.
+
+Free Supabase projects pause after a week with no traffic. The data is kept, and **Restore** in the Supabase dashboard brings it back. The agent routes allow up to 300 s, the Hobby limit with Fluid compute (on by default).
+
+Writes take a Postgres advisory lock and catch up on anything other instances wrote before chaining, so the hash chain stays a single line however many instances are serving. Chowkidar's daily patrol is claimed in the database, so it runs once per Saakh day.
 
 ---
 
@@ -158,7 +172,7 @@ Built responsive down to phones (bottom navigation with a marigold centre mic, b
 * **Channels:** WhatsApp Business API, so slips, confirmations and Dakiya's reminders arrive where traders already are, with *"reply HAAN to confirm"*.
 * **Payments:** match UPI credits automatically to open slips; support partial payments.
 * **Abuse resistance:** weight a confirmation by the confirmer's own history, and flag rings of businesses confirming each other's slips.
-* **Storage:** move the lake to Postgres or object storage with signed checkpoints, and expose read-only score lookups to lenders.
+* **Storage:** signed checkpoints for the Postgres lake, and read-only score lookups for lenders.
 
 ---
 

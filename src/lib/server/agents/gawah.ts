@@ -84,7 +84,7 @@ export async function interpretReply(rec: RunRecorder, world: World, actor: Busi
 
   const raiser = world.businesses.get(raiserOf(target))!.name;
   if (decision === "confirm") {
-    confirmSlip(actor.id, target.id);
+    await confirmSlip(actor.id, target.id);
     const fresh = slipById(getWorld(), target.id);
     rec.step("gawah", "write", "stamp_slip", `${target.code} confirmed · ${rupees(target.amount)} to ${raiser}`);
     return {
@@ -154,7 +154,7 @@ export async function requestConfirmation(slipId: string) {
     }
   } else rec.mode = "offline";
 
-  appendEvents([{ type: "confirmation.requested", actor: "agent:gawah", data: { slipId, to: confirmer.id, message, agent: "gawah" } }]);
+  await appendEvents([{ type: "confirmation.requested", actor: "agent:gawah", data: { slipId, to: confirmer.id, message, agent: "gawah" } }]);
   rec.step("gawah", "write", `deliver → ${confirmer.name}`, message.slice(0, 120));
-  rec.finish(`Asked ${confirmer.name} to confirm ${rupees(s.amount)} from ${raiser.name}.`);
+  await rec.finish(`Asked ${confirmer.name} to confirm ${rupees(s.amount)} from ${raiser.name}.`);
 }

@@ -1,3 +1,4 @@
+import { openLake } from "@/lib/server/store";
 import { getWorld, slipById } from "@/lib/server/views";
 import { CommandError } from "@/lib/server/commands";
 import { composeReminder, deliverReminder } from "@/lib/server/agents/dakiya";
@@ -10,6 +11,7 @@ export async function POST(req: Request, ctx: RouteContext<"/api/slips/[id]/remi
   try {
     const { id } = await ctx.params;
     const b = await body<{ actorId: string; message?: string; tone?: string; dryRun?: boolean }>(req);
+    await openLake();
     const world = getWorld();
     const slip = slipById(world, id);
     if (!slip) throw new CommandError("That slip doesn't exist.", 404);
@@ -18,7 +20,7 @@ export async function POST(req: Request, ctx: RouteContext<"/api/slips/[id]/remi
     let tone = b.tone ?? "gentle";
     if (!message) ({ message, tone } = await composeReminder(world, slip));
     if (b.dryRun) return Response.json({ message, tone });
-    deliverReminder(b.actorId, id, message, tone);
+    await deliverReminder(b.actorId, id, message, tone);
     return Response.json({ message, tone, slip: slipById(getWorld(), id) });
   } catch (e) {
     return fail(e);

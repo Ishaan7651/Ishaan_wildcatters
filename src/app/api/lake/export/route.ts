@@ -1,10 +1,11 @@
-import { readLake } from "@/lib/server/store";
+import { openLake, readLake } from "@/lib/server/store";
 import { fail } from "@/lib/server/http";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
+    await openLake();
     const body = readLake().map((e) => JSON.stringify(e)).join("\n") + "\n";
     return new Response(body, {
       headers: {

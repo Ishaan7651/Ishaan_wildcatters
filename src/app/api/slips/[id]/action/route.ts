@@ -9,6 +9,7 @@ import {
   withdrawSlip,
 } from "@/lib/server/commands";
 import { body, fail } from "@/lib/server/http";
+import { openLake } from "@/lib/server/store";
 
 export const dynamic = "force-dynamic";
 
@@ -19,27 +20,28 @@ export async function POST(req: Request, ctx: RouteContext<"/api/slips/[id]/acti
     const { id } = await ctx.params;
     const b = await body<{ actorId: string; action: Action; reason?: string; amount?: number; paidOn?: string }>(req);
     if (!b.actorId) throw new CommandError("Pick which business you are first.");
+    await openLake();
     switch (b.action) {
       case "confirm":
-        confirmSlip(b.actorId, id);
+        await confirmSlip(b.actorId, id);
         break;
       case "dispute":
-        disputeSlip(b.actorId, id, b.reason ?? "", b.amount);
+        await disputeSlip(b.actorId, id, b.reason ?? "", b.amount);
         break;
       case "accept_counter":
-        acceptCounter(b.actorId, id);
+        await acceptCounter(b.actorId, id);
         break;
       case "withdraw":
-        withdrawSlip(b.actorId, id);
+        await withdrawSlip(b.actorId, id);
         break;
       case "record_payment":
-        recordPayment(b.actorId, id, b.paidOn);
+        await recordPayment(b.actorId, id, b.paidOn);
         break;
       case "ack_payment":
-        acknowledgePayment(b.actorId, id, true);
+        await acknowledgePayment(b.actorId, id, true);
         break;
       case "reject_payment":
-        acknowledgePayment(b.actorId, id, false);
+        await acknowledgePayment(b.actorId, id, false);
         break;
       default:
         throw new CommandError("Unknown action.");

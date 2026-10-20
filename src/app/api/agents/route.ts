@@ -1,4 +1,4 @@
-import { readRuns, nowISO } from "@/lib/server/store";
+import { openLake, readRuns, nowISO } from "@/lib/server/store";
 import { aiInfo } from "@/lib/server/ai/openrouter";
 import { AGENT_ORDER } from "@/lib/shared/agents";
 import { fail } from "@/lib/server/http";
@@ -10,8 +10,9 @@ export async function GET(req: Request) {
     const url = new URL(req.url);
     const limit = Math.min(300, Number(url.searchParams.get("limit")) || 60);
     const agent = url.searchParams.get("agent");
+    await openLake();
     const now = nowISO();
-    const runs = readRuns()
+    const runs = (await readRuns())
       .filter((r) => r.startedAt <= now)
       .sort((a, b) => (a.startedAt < b.startedAt ? -1 : a.startedAt > b.startedAt ? 1 : 0));
     const stats = AGENT_ORDER.map((name) => {

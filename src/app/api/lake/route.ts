@@ -1,4 +1,4 @@
-import { readLake, nowISO, type LakeEvent } from "@/lib/server/store";
+import { openLake, readLake, nowISO, type LakeEvent } from "@/lib/server/store";
 import { getWorld } from "@/lib/server/views";
 import { rupees } from "@/lib/shared/money";
 import { prettyDay } from "@/lib/shared/dates";
@@ -12,6 +12,7 @@ export async function GET(req: Request) {
     const limit = Math.min(200, Number(url.searchParams.get("limit")) || 60);
     const type = url.searchParams.get("type");
     const before = Number(url.searchParams.get("before")) || Infinity;
+    await openLake();
     const all = readLake();
     const now = nowISO();
     const world = getWorld();

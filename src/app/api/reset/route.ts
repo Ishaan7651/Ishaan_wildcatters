@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 /** Wipes the demo lake and reseeds it relative to today. */
 export async function POST() {
   try {
-    resetLake();
+    await resetLake();
     forgetPatrols();
     return Response.json({ ok: true });
   } catch (e) {

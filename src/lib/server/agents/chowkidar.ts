@@ -6,7 +6,7 @@
 import { diffDays, prettyDay } from "@/lib/shared/dates";
 import { rupees } from "@/lib/shared/money";
 import { penaltyDropDates } from "@/lib/shared/score";
-import { appendEvents, readLake, readRuns, today, type EventDraft } from "../store";
+import { appendEvents, claimPatrolDay, lakeEpoch, readLake, readRuns, today, type EventDraft } from "../store";
 import { getWorld, scoreOf, slipView } from "../views";
 import { chat, hasKey } from "../ai/openrouter";
 import { RunRecorder } from "../ai/runtime";
@@ -28,15 +28,23 @@ export function forgetPatrols() {
   g.__saakhPatrolDay = undefined;
 }
 
-export function patrolDoneToday() {
+/**
+ * True for the one caller that should walk today's patrol. Chowkidar walks
+ * once per Saakh day, however many instances are serving the app.
+ */
+export async function claimPatrol() {
   const day = today();
-  return g.__saakhPatrolDay === day || readRuns().some((r) => r.agent === "chowkidar" && r.simDay === day);
+  const key = `${lakeEpoch()}:${day}`;
+  if (g.__saakhPatrolDay === key) return false;
+  g.__saakhPatrolDay = key;
+  if ((await readRuns()).some((r) => r.agent === "chowkidar" && r.simDay === day)) return false;
+  return claimPatrolDay(day);
 }
 
 /** The deterministic half: assess penalties right now, pick who to remind. */
-export function patrolNow(trigger: string): PatrolOutcome {
+export async function patrolNow(trigger: string): Promise<PatrolOutcome> {
   const world = getWorld();
-  g.__saakhPatrolDay = world.today;
+  g.__saakhPatrolDay = `${lakeEpoch()}:${world.today}`;
   const rec = new RunRecorder("chowkidar", trigger);
   rec.mode = hasKey() ? "ai" : "offline";
 
@@ -79,7 +87,7 @@ export function patrolNow(trigger: string): PatrolOutcome {
     });
     newPoints.push({ debtor: world.businesses.get(p.debtorId)?.name ?? p.debtorId, slip: p.code, month: p.month, droppedOn: p.droppedOn, scoreAfter });
   }
-  appendEvents(drafts);
+  await appendEvents(drafts);
   newPoints.slice(0, 8).forEach((p) =>
     rec.step("chowkidar", "write", `assess_penalty · ${p.debtor}`, `${p.slip} · month ${p.month} late · score → ${p.scoreAfter}`),
   );
@@ -124,11 +132,11 @@ export async function patrolFollowUp(o: PatrolOutcome) {
     if (!s) continue;
     const v = slipView(world, s);
     const { message, tone } = await composeReminder(world, v, dakiya);
-    deliverReminderQuiet(id, message, tone);
+    await deliverReminderQuiet(id, message, tone);
     dakiya.step("dakiya", "write", `deliver → ${v.debtor.name}`, `${tone} · ${rupees(v.amount)}`);
     sent.push(`${v.debtor.name} (${rupees(v.amount)}, ${tone})`);
   }
-  if (sent.length) dakiya.finish(`Sent ${sent.length} reminder${sent.length === 1 ? "" : "s"} after the patrol: ${sent.join(", ")}.`);
+  if (sent.length) await dakiya.finish(`Sent ${sent.length} reminder${sent.length === 1 ? "" : "s"} after the patrol: ${sent.join(", ")}.`);
 
   const facts = [
     `Day: ${prettyDay(o.day)}.`,
@@ -163,12 +171,12 @@ export async function patrolFollowUp(o: PatrolOutcome) {
   return o.rec.finish(summary);
 }
 
-function deliverReminderQuiet(slipId: string, message: string, tone: string) {
+async function deliverReminderQuiet(slipId: string, message: string, tone: string) {
   // Same event as a user-sent reminder, but logged under the patrol's runs.
   const world = getWorld();
   const s = world.slips.get(slipId);
   if (!s) return;
-  appendEvents([{ type: "reminder.sent", actor: "agent:dakiya", data: { slipId, from: s.creditorId, to: s.debtorId, message, tone, agent: "dakiya" } }]);
+  await appendEvents([{ type: "reminder.sent", actor: "agent:dakiya", data: { slipId, from: s.creditorId, to: s.debtorId, message, tone, agent: "dakiya" } }]);
 }
 
 function summarisePoints(points: PatrolOutcome["newPoints"]) {
@@ -183,7 +191,7 @@ function templateReport(o: PatrolOutcome, reminders: number) {
 }
 
 export async function fullPatrol(trigger: string) {
-  const o = patrolNow(trigger);
+  const o = await patrolNow(trigger);
   return patrolFollowUp(o);
 }
 

@@ -1,10 +1,11 @@
 import { AUDIO_MODEL, chat, hasKey } from "@/lib/server/ai/openrouter";
 import { body, fail } from "@/lib/server/http";
 import { CommandError } from "@/lib/server/commands";
+import { openLake } from "@/lib/server/store";
 import { getWorld } from "@/lib/server/views";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 /**
  * Fallback speech-to-text for browsers without the Web Speech API (e.g.
@@ -15,6 +16,7 @@ export async function POST(req: Request) {
     if (!hasKey()) throw new CommandError("Voice in this browser needs the AI key. Type instead, or use Chrome/Edge.", 503);
     const { audio } = await body<{ audio: string }>(req);
     if (!audio || audio.length > 8_000_000) throw new CommandError("The recording was empty or too long.");
+    await openLake();
     const names = [...getWorld().businesses.values()].map((b) => b.name).join(", ");
     const res = await chat({
       model: AUDIO_MODEL,

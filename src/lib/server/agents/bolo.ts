@@ -62,13 +62,13 @@ export async function bolo(
     }
   } catch (e) {
     rec.step(rec.agent, "error", "Something went wrong", (e as Error).message.slice(0, 200));
-    rec.finish(`Failed: ${(e as Error).message.slice(0, 120)}`, "error");
+    await rec.finish(`Failed: ${(e as Error).message.slice(0, 120)}`, "error");
     emit({ type: "error", message: "That didn't work — try saying it another way." });
     return;
   }
 
   emit({ type: "result", intent, result });
-  const run = rec.finish(summarise(intent, result));
+  const run = await rec.finish(summarise(intent, result));
   emit({ type: "done", runId: run.id, ms: run.durationMs, mode: rec.mode });
 }
 

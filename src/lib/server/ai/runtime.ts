@@ -35,7 +35,7 @@ export class RunRecorder {
     return Date.now() - this.t0;
   }
 
-  finish(summary: string, status: "ok" | "error" = "ok"): AgentRun {
+  async finish(summary: string, status: "ok" | "error" = "ok"): Promise<AgentRun> {
     const run: AgentRun = {
       id: this.id,
       agent: this.agent,
@@ -51,7 +51,7 @@ export class RunRecorder {
       steps: this.steps,
       tokens: this.tokens || undefined,
     };
-    appendRun(run);
+    await appendRun(run);
     return run;
   }
 }

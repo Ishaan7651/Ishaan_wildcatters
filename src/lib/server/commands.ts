@@ -49,7 +49,7 @@ export interface RaiseInput {
   utterance?: string;
 }
 
-export function raiseSlip(input: RaiseInput) {
+export async function raiseSlip(input: RaiseInput) {
   const world = getWorld();
   const actor = mustBiz(world, input.actorId);
   const drafts: EventDraft[] = [];
@@ -105,44 +105,44 @@ export function raiseSlip(input: RaiseInput) {
       utterance: input.utterance?.slice(0, 300),
     },
   });
-  appendEvents(drafts);
+  await appendEvents(drafts);
   return { slipId, counterpartyId: counterparty.id, invited: !!counterparty.invitedBy && counterparty.invitedBy === actor.id };
 }
 
-export function confirmSlip(actorId: string, slipId: string) {
+export async function confirmSlip(actorId: string, slipId: string) {
   const world = getWorld();
   const s = mustSlip(world, slipId);
   if (s.status !== "awaiting") throw new CommandError("This slip isn't waiting for confirmation.", 409);
   if (confirmerOf(s) !== actorId) throw new CommandError("Only the other side of the slip can confirm it.", 403);
-  appendEvents([{ type: "slip.confirmed", actor: actorId, data: { slipId, by: actorId } }]);
+  await appendEvents([{ type: "slip.confirmed", actor: actorId, data: { slipId, by: actorId } }]);
 }
 
-export function disputeSlip(actorId: string, slipId: string, reason: string, counterAmount?: number) {
+export async function disputeSlip(actorId: string, slipId: string, reason: string, counterAmount?: number) {
   const world = getWorld();
   const s = mustSlip(world, slipId);
   if (s.status !== "awaiting") throw new CommandError("This slip isn't waiting for confirmation.", 409);
   if (confirmerOf(s) !== actorId) throw new CommandError("Only the other side of the slip can dispute it.", 403);
   const counter = counterAmount && counterAmount > 0 && Math.round(counterAmount) !== s.amount ? Math.round(counterAmount) : undefined;
-  appendEvents([{ type: "slip.disputed", actor: actorId, data: { slipId, by: actorId, reason: reason.slice(0, 240), ...(counter ? { counterAmount: counter } : {}) } }]);
+  await appendEvents([{ type: "slip.disputed", actor: actorId, data: { slipId, by: actorId, reason: reason.slice(0, 240), ...(counter ? { counterAmount: counter } : {}) } }]);
 }
 
-export function acceptCounter(actorId: string, slipId: string) {
+export async function acceptCounter(actorId: string, slipId: string) {
   const world = getWorld();
   const s = mustSlip(world, slipId);
   if (s.status !== "countered" || !s.dispute?.counterAmount) throw new CommandError("There's no revised amount to accept.", 409);
   if (raiserOf(s) !== actorId) throw new CommandError("Only the person who raised the slip can accept the revision.", 403);
-  appendEvents([{ type: "slip.counter_accepted", actor: actorId, data: { slipId, by: actorId, amount: s.dispute.counterAmount } }]);
+  await appendEvents([{ type: "slip.counter_accepted", actor: actorId, data: { slipId, by: actorId, amount: s.dispute.counterAmount } }]);
 }
 
-export function withdrawSlip(actorId: string, slipId: string) {
+export async function withdrawSlip(actorId: string, slipId: string) {
   const world = getWorld();
   const s = mustSlip(world, slipId);
   if (!["awaiting", "disputed", "countered"].includes(s.status)) throw new CommandError("Confirmed slips can't be withdrawn.", 409);
   if (raiserOf(s) !== actorId) throw new CommandError("Only the person who raised the slip can withdraw it.", 403);
-  appendEvents([{ type: "slip.withdrawn", actor: actorId, data: { slipId, by: actorId } }]);
+  await appendEvents([{ type: "slip.withdrawn", actor: actorId, data: { slipId, by: actorId } }]);
 }
 
-export function recordPayment(actorId: string, slipId: string, paidOn?: string) {
+export async function recordPayment(actorId: string, slipId: string, paidOn?: string) {
   const world = getWorld();
   const s = mustSlip(world, slipId);
   if (s.status !== "confirmed") throw new CommandError("Only confirmed slips can be paid.", 409);
@@ -152,16 +152,16 @@ export function recordPayment(actorId: string, slipId: string, paidOn?: string) 
   const day = paidOn && /^\d{4}-\d{2}-\d{2}$/.test(paidOn) ? paidOn : world.today;
   if (day > world.today) throw new CommandError("The payment date can't be in the future.");
   if (day < istDay(s.raisedAt)) throw new CommandError("The payment date is before the slip was raised.");
-  appendEvents([{ type: "payment.recorded", actor: actorId, data: { slipId, by: actorId, role, paidOn: day, amount: s.amount } }]);
+  await appendEvents([{ type: "payment.recorded", actor: actorId, data: { slipId, by: actorId, role, paidOn: day, amount: s.amount } }]);
   return role;
 }
 
-export function acknowledgePayment(actorId: string, slipId: string, accept: boolean) {
+export async function acknowledgePayment(actorId: string, slipId: string, accept: boolean) {
   const world = getWorld();
   const s = mustSlip(world, slipId);
   if (!s.payment || s.payment.acknowledged) throw new CommandError("There's no payment waiting for confirmation.", 409);
   if (actorId !== s.creditorId) throw new CommandError("Only the lender can confirm a payment arrived.", 403);
-  appendEvents([
+  await appendEvents([
     accept
       ? { type: "payment.acknowledged", actor: actorId, data: { slipId, by: actorId } }
       : { type: "payment.rejected", actor: actorId, data: { slipId, by: actorId, reason: "Not received" } },

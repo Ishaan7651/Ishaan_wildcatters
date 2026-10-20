@@ -1,8 +1,9 @@
 import type { BoloEvent } from "@/lib/shared/types";
+import { openLake } from "@/lib/server/store";
 import { bolo } from "@/lib/server/agents/bolo";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 /** Streams agent steps as NDJSON while the agents work, then the result. */
 export async function POST(req: Request) {
@@ -20,6 +21,7 @@ export async function POST(req: Request) {
     async start(controller) {
       const emit = (e: BoloEvent) => controller.enqueue(enc.encode(JSON.stringify(e) + "\n"));
       try {
+        await openLake();
         await bolo({ utterance, actorId: input.actorId!, source: input.source === "voice" ? "voice" : "text" }, emit);
       } catch (e) {
         emit({ type: "error", message: (e as Error).message });

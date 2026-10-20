@@ -74,15 +74,15 @@ export async function draftFromRequest(rec: RunRecorder, world: World, actor: Bu
   return { kind: "reminder_draft", slip, message, tone };
 }
 
-export function deliverReminder(actorId: string, slipId: string, message: string, tone: string, trigger = "Sent by you") {
+export async function deliverReminder(actorId: string, slipId: string, message: string, tone: string, trigger = "Sent by you") {
   const world = getWorld();
   const v = slipById(world, slipId);
   if (!v) throw new CommandError("That slip doesn't exist.", 404);
   if (v.creditor.id !== actorId && !actorId.startsWith("agent:")) throw new CommandError("Only the lender can send a reminder.", 403);
   if (v.status !== "confirmed") throw new CommandError("Reminders are for confirmed, unpaid slips.", 409);
-  appendEvents([{ type: "reminder.sent", actor: "agent:dakiya", data: { slipId, from: v.creditor.id, to: v.debtor.id, message: message.slice(0, 600), tone, agent: "dakiya" } }]);
+  await appendEvents([{ type: "reminder.sent", actor: "agent:dakiya", data: { slipId, from: v.creditor.id, to: v.debtor.id, message: message.slice(0, 600), tone, agent: "dakiya" } }]);
   const rec = new RunRecorder("dakiya", trigger, v.creditor.id);
   rec.mode = hasKey() ? "ai" : "offline";
   rec.step("dakiya", "write", `deliver → ${v.debtor.name}`, message.slice(0, 120));
-  rec.finish(`Sent a ${tone} reminder to ${v.debtor.name} for ${rupees(v.amount)}.`);
+  await rec.finish(`Sent a ${tone} reminder to ${v.debtor.name} for ${rupees(v.amount)}.`);
 }
