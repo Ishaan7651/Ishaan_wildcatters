@@ -1,7 +1,5 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
-
 /* ------------------------------------------------------------------
    Saakh — "bazaar" palette
    Peacock teal (mor) for anything you can act on, marigold (genda) for
@@ -49,48 +47,6 @@
   --agent-khoji: #3d8424;
 
   color-scheme: light;
-}
-
-[data-theme="dark"] {
-  --paper: #0b1412;
-  --paper-deep: #060d0b;
-  --sheet: #121e1b;
-  --sheet-2: #162421;
-  --ink: #e7f0ed;
-  --ink-2: #b2c3be;
-  --ink-3: #82958f;
-  --ink-4: #556761;
-  --rule: #213230;
-  --rule-2: #2e4440;
-  --mor: #3ccab8;
-  --mor-2: #62d8c8;
-  --mor-soft: #11372f;
-  --mor-ink: #7fe2d4;
-  --genda: #ffc23a;
-  --genda-2: #ffcf5c;
-  --genda-soft: #382c0c;
-  --genda-ink: #ffd56e;
-  --stamp: #ff6a5d;
-  --stamp-soft: #3a1915;
-  --haldi: #ff9a3f;
-  --haldi-ink: #ffb26b;
-  --haldi-soft: #38230f;
-  --neem: #4bd488;
-  --neem-soft: #0e2f1f;
-  --duplicate: #2c2713;
-  --postcard: #29241a;
-  --on-mor: #04130f;
-  --on-genda: #1d1400;
-  --shadow-rgb: 0 0 0;
-
-  --agent-sutradhar: #e7f0ed;
-  --agent-munshi: #3ccab8;
-  --agent-gawah: #5ea2ef;
-  --agent-chowkidar: #f2a93b;
-  --agent-dakiya: #ff6a5d;
-  --agent-khoji: #8fd463;
-
-  color-scheme: dark;
 }
 
 @theme inline {
@@ -327,6 +283,14 @@ body::before {
   0% { opacity: 0; transform: scale(2.4); }
   60% { opacity: 1; transform: scale(0.85); }
   100% { opacity: 1; transform: scale(1); }
+}
+/* A coin falls into a taraazu pan, lands, and settles with a small hop. */
+@keyframes coin-drop {
+  0% { opacity: 0; transform: translateY(-110px); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+  12% { opacity: 1; }
+  70% { transform: translateY(0); animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1); }
+  85% { transform: translateY(-6px); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 @keyframes bob {
   0%, 100% { transform: translateY(0); }

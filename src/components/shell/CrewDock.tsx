@@ -23,8 +23,9 @@ export function CrewDock() {
   return (
     <button
       onClick={() => setDiaryOpen(true)}
-      className="group fixed right-5 bottom-5 z-30 hidden max-w-[360px] items-center gap-3 rounded-full border border-rule bg-sheet/95 py-1.5 pr-4 pl-1.5 text-left shadow-[var(--shadow-lift)] backdrop-blur-md transition-transform hover:-translate-y-0.5 md:flex"
+      className="group fixed right-5 bottom-5 z-30 hidden max-w-[360px] items-center gap-3 rounded-full border border-rule bg-sheet/95 p-1.5 text-left shadow-[var(--shadow-lift)] backdrop-blur-md transition-transform hover:-translate-y-0.5 md:flex"
       aria-label="Open the agents' diary"
+      title={last ? `${istTime(last.startedAt)} · ${AGENTS[last.agent].title}: ${last.summary}` : "The agents' diary"}
     >
       <AnimatePresence mode="wait" initial={false}>
         {activeAgent ? (
@@ -42,23 +43,12 @@ export function CrewDock() {
           </motion.span>
         )}
       </AnimatePresence>
-      <span className="hidden min-w-0 leading-tight xl:block">
-        {activeAgent ? (
-          <>
-            <span className="block text-[13px] font-semibold text-ink">
-              {AGENTS[activeAgent].title} is working<span className="writing-dot">…</span>
-            </span>
-            <span className="block truncate text-[11.5px] text-ink-3">{step ? step.label : "reading what you said"}</span>
-          </>
-        ) : (
-          <>
-            <span className="block text-[13px] font-semibold text-ink">The crew</span>
-            <span className="block max-w-[210px] truncate text-[11.5px] text-ink-3">
-              {last ? `${istTime(last.startedAt)} · ${AGENTS[last.agent].title}: ${last.summary}` : "Six agents keeping your ledger"}
-            </span>
-          </>
-        )}
-      </span>
+      {activeAgent && (
+        <span className="hidden pr-2.5 text-[13px] font-semibold text-ink xl:block">
+          {AGENTS[activeAgent].title}
+          <span className="writing-dot">…</span>
+        </span>
+      )}
     </button>
   );
 }

@@ -75,8 +75,8 @@ export function Avatar({ id, name, size = 36, className }: { id: string; name: s
         width: size,
         height: size,
         fontSize: size * 0.38,
-        background: `light-dark(oklch(0.93 0.04 ${h}), oklch(0.32 0.06 ${h}))`,
-        color: `light-dark(oklch(0.38 0.11 ${h}), oklch(0.88 0.08 ${h}))`,
+        background: `oklch(0.93 0.04 ${h})`,
+        color: `oklch(0.38 0.11 ${h})`,
       }}
     >
       {initials}

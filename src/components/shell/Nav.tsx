@@ -36,13 +36,13 @@ export function Rail() {
   return (
     <nav className="sticky top-[64px] hidden h-[calc(100dvh-64px)] w-[236px] shrink-0 flex-col px-3 py-6 md:flex" aria-label="Main">
       <RailGroup items={NAV.slice(0, 4)} path={path} count={count} />
-      <p className="eyebrow mt-7 mb-2 px-3 !text-[10px]">Under the hood</p>
+      <hr className="mx-3 my-5 border-rule" />
       <RailGroup items={NAV.slice(4)} path={path} count={0} />
 
       <div className="mt-auto px-3">
         {confirmReset ? (
           <div className="rounded-2xl border border-stamp/30 bg-stamp-soft/60 p-3 text-[12.5px] text-ink-2">
-            <p>Start a fresh market with new slips?</p>
+            <p>Start fresh?</p>
             <div className="mt-2 flex items-center gap-2">
               <button
                 className="rounded-full bg-stamp px-3 py-1.5 font-semibold text-white"
@@ -54,7 +54,7 @@ export function Rail() {
                   toast({ title: "Demo data reset", body: "Fresh market, fresh slips, today's date." });
                 }}
               >
-                Reset everything
+                Reset
               </button>
               <button className="text-ink-3 hover:text-ink" onClick={() => setConfirmReset(false)}>
                 Keep
@@ -63,7 +63,7 @@ export function Rail() {
           </div>
         ) : (
           <button onClick={() => setConfirmReset(true)} className="flex items-center gap-2 text-[12px] text-ink-3 hover:text-ink">
-            <RotateCcw size={13} /> Reset demo data
+            <RotateCcw size={13} /> Reset demo
           </button>
         )}
       </div>
@@ -105,12 +105,9 @@ function RailGroup({ items, path, count }: { items: typeof NAV; path: string; co
                   </span>
                 )}
               </span>
-              <span className="min-w-0 flex-1 leading-tight">
-                <span className="flex items-baseline justify-between gap-2">
-                  <span className={clsx("text-[14.5px] font-semibold", active ? "text-ink" : "text-ink-2 group-hover:text-ink")}>{n.label}</span>
-                  <span className="font-deva text-[11.5px] text-ink-4">{n.hindi}</span>
-                </span>
-                <span className="block truncate text-[11.5px] text-ink-3">{n.hint}</span>
+              <span className="flex min-w-0 flex-1 items-baseline justify-between gap-2" title={n.hint}>
+                <span className={clsx("text-[14.5px] font-semibold", active ? "text-ink" : "text-ink-2 group-hover:text-ink")}>{n.label}</span>
+                <span className="font-deva text-[11.5px] text-ink-4">{n.hindi}</span>
               </span>
             </Link>
           </li>

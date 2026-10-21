@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { Check, CheckCheck, ChevronLeft, ChevronRight, X } from "lucide-react";
 import type { AppState, SlipView } from "@/lib/shared/types";
 import { istDay, prettyDay } from "@/lib/shared/dates";
-import { rupees, rupeesInWords } from "@/lib/shared/money";
+import { rupees } from "@/lib/shared/money";
 import { postJSON } from "@/lib/client/api";
 import { useApp } from "@/components/providers/Providers";
 import { Stamp, type StampKind } from "@/components/slip/Stamp";
@@ -57,10 +57,7 @@ export function WaitingCards({ state, layout = "row" }: { state: AppState; layou
         <span className="grid size-11 shrink-0 place-items-center rounded-full bg-neem-soft text-neem">
           <CheckCheck size={22} />
         </span>
-        <div>
-          <p className="text-[15px] font-semibold text-ink">Nothing waiting on you</p>
-          <p className="text-[13px] text-ink-3">When someone writes a slip with you, it lands here for a quick yes or no.</p>
-        </div>
+        <p className="text-[15px] font-semibold text-ink">Nothing waiting on you</p>
       </div>
     );
 
@@ -151,14 +148,14 @@ function WaitCard({
 
   const ask =
     kind === "confirm"
-      ? `wrote a slip with you · ${prettyDay(istDay(slip.raisedAt), false)}`
+      ? prettyDay(istDay(slip.raisedAt), false)
       : kind === "ack"
-        ? `says they paid you · ${prettyDay(slip.payment?.paidOn ?? istDay(slip.raisedAt), false)}`
+        ? `says paid · ${prettyDay(slip.payment?.paidOn ?? istDay(slip.raisedAt), false)}`
         : disputed
-          ? "doesn't agree with your slip"
-          : "wants a different amount";
+          ? "disputes this"
+          : "counter-offer";
   const what =
-    kind === "confirm" ? (iAmLender ? "They owe you" : "You owe them") : kind === "ack" ? "Did this reach you?" : disputed ? "Disputed — counts for no one" : `Not ${rupees(slip.amount)}, but`;
+    kind === "confirm" ? (iAmLender ? "They owe you" : "You owe them") : kind === "ack" ? "Got it?" : disputed ? "Disputed" : `Not ${rupees(slip.amount)}, but`;
 
   return (
     <article className="relative flex h-full flex-col overflow-hidden rounded-[20px] border border-rule bg-sheet shadow-[var(--shadow-sheet)]">
@@ -175,9 +172,8 @@ function WaitCard({
       <div className="relative px-4 pt-3 pb-1">
         <p className="text-[12.5px] font-medium text-ink-2">{what}</p>
         <p className="hand text-[38px] leading-[1.05]">{rupees(amount)}</p>
-        <p className="truncate text-[11.5px] text-ink-3 italic first-letter:uppercase">{rupeesInWords(amount)}</p>
         <p className="mt-1.5 truncate text-[12.5px] text-ink-2">
-          {slip.note || "No note"} · due <b className="font-semibold text-ink">{prettyDay(slip.dueDate, false)}</b>
+          {slip.note ? `${slip.note} · ` : ""}due <b className="font-semibold text-ink">{prettyDay(slip.dueDate, false)}</b>
         </p>
         {kind === "counter" && slip.dispute?.reason && <p className="hand mt-1 truncate text-[15px]">“{slip.dispute.reason}”</p>}
         <AnimatePresence>

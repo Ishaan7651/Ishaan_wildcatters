@@ -17,25 +17,12 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#edf3f1" },
-    { media: "(prefers-color-scheme: dark)", color: "#0b1412" },
-  ],
+  themeColor: "#edf3f1",
 };
-
-// Sets the theme before paint so there's no flash.
-const themeScript = `(function(){try{var t=localStorage.getItem('saakh.theme');if(!t){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}document.documentElement.dataset.theme=t}catch(e){}})()`;
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="en-IN"
-      suppressHydrationWarning
-      className={`${anek.variable} ${anekDeva.variable} ${hind.variable} ${kalam.variable} ${plexMono.variable}`}
-    >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
+    <html lang="en-IN" className={`${anek.variable} ${anekDeva.variable} ${hind.variable} ${kalam.variable} ${plexMono.variable}`}>
       <body>
         <Providers>
           <AppShell>{children}</AppShell>

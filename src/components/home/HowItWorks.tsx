@@ -31,7 +31,6 @@ export function HowItWorks() {
         </span>
       ),
       title: "Say it",
-      body: <>“Sharma owes me ₹2,000 by Diwali.” Munshi writes the slip for you.</>,
     },
     {
       art: (
@@ -40,16 +39,10 @@ export function HowItWorks() {
         </span>
       ),
       title: "They say haan",
-      body: <>Sharma gets it and confirms. Nothing counts until both sides agree.</>,
     },
     {
       art: <ScoreRing score={97} band="excellent" size={60} />,
-      title: "Late costs points",
-      body: (
-        <>
-          Everyone starts at <b className="text-ink">100</b>. Each month a debt runs late, the borrower loses <b className="text-stamp">1 point</b>.
-        </>
-      ),
+      title: "Late = −1 point",
     },
   ];
 
@@ -67,10 +60,9 @@ export function HowItWorks() {
       >
         <X size={15} />
       </button>
-      <p className="eyebrow mb-3">How Saakh works</p>
       <ol className="grid gap-4 sm:grid-cols-3 sm:gap-3">
         {steps.map((s, i) => (
-          <li key={s.title} className="flex items-start gap-3 sm:flex-col sm:gap-2.5">
+          <li key={s.title} className="flex items-center gap-3 sm:flex-col sm:items-start sm:gap-2.5">
             <div className="flex shrink-0 items-center gap-2">
               {s.art}
               {i < steps.length - 1 && (
@@ -79,13 +71,10 @@ export function HowItWorks() {
                 </svg>
               )}
             </div>
-            <div>
-              <p className="display text-[16px] font-bold text-ink">
-                <span className="mr-1.5 text-ink-4 tabular">{i + 1}.</span>
-                {s.title}
-              </p>
-              <p className="text-[13px] leading-snug text-ink-2">{s.body}</p>
-            </div>
+            <p className="display text-[16px] font-bold text-ink">
+              <span className="mr-1.5 text-ink-4 tabular">{i + 1}.</span>
+              {s.title}
+            </p>
           </li>
         ))}
       </ol>

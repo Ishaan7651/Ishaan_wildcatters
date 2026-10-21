@@ -21,7 +21,7 @@ Six AI agents do all the busywork: they fill in the slips, get the other side's 
 | Score starts at 100, −1 for every month of delay | Implemented exactly; see [the rule](#the-scoring-rule). **Chowkidar** walks the ledger every day, records each lost point and explains it. Hover any red mark on a score ring to see which debt cost it. |
 | Searchable by voice/text: score + pending loans + how long | **Khoji** answers using tools over the ledger: the score, points lost and why, how many payments are pending, the total, how many are overdue, and how long each has waited. It speaks the answer aloud and shows the evidence as cards. |
 | AI-native, agentic AI doing the busywork | Six tool-calling agents on **OpenRouter** (Claude Haiku 5.5 by default). A live diary (*Roznamcha*) shows every step and tool call as it happens. |
-| Your choice of UX ("Google Maps etc.") | A **Trust map** of who owes whom across India, a **time machine** to fast-forward the clock and watch scores fall, rubber-stamp confirmations, postcard reminders, and full dark mode and mobile layouts. |
+| Your choice of UX ("Google Maps etc.") | A **Trust map** of who owes whom across India, a **time machine** to fast-forward the clock and watch scores fall, rubber-stamp confirmations, postcard reminders, and mobile layouts. |
 
 ---
 
@@ -63,7 +63,7 @@ The rule lives in one function: [`src/lib/shared/score.ts`](src/lib/shared/score
 
 **Bands:** 95–100 Excellent (पक्की साख) · 85–94 Good · 70–84 Watch · below 70 Risky.
 
-![A business's record, dark mode](docs/screens/4-profile-dark.png)
+![A business's record](docs/screens/4-profile-dark.png)
 
 ---
 
@@ -158,7 +158,7 @@ The signature element on the home page is the **taraazu**, a shop's balance scal
 * **Hash chain:** the Data lake page draws the newest events as linked blocks, and *Verify every link* walks a light along the chain.
 * **Crew dock:** a corner pill shows which agent is working right now and opens the full diary.
 
-Built responsive down to phones (bottom navigation with a marigold centre mic, bottom-sheet drawers), with light and dark themes, visible keyboard focus and reduced-motion support. The screenshots above predate the current palette.
+Built responsive down to phones (bottom navigation with a marigold centre mic, bottom-sheet drawers), a single light theme, visible keyboard focus and reduced-motion support. The screenshots above predate the current palette.
 
 ![Trust map](docs/screens/5-map.png)
 ![The agents](docs/screens/6-agents.png)

@@ -43,8 +43,7 @@ export default function AgentsPage() {
   return (
     <div className="mx-auto max-w-[1180px]">
       <PageHeader title="Agents" hindi="कारिंदे">
-        Six agents do the busywork of a trading house: writing slips, getting the other side&apos;s word, keeping score, chasing payments and answering
-        questions. They only ever <i>propose</i> — every change to the ledger goes through the same rules a person would.
+        Six helpers. They propose — the rules decide.
       </PageHeader>
 
       {data && (

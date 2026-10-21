@@ -60,7 +60,6 @@ export default function LedgerPage() {
   return (
     <div className="mx-auto max-w-[1100px]">
       <PageHeader
-        eyebrow={state?.me.business.name}
         title="Ledger"
         hindi="बही"
         action={
@@ -68,16 +67,11 @@ export default function LedgerPage() {
             <PenLine size={16} /> Write a slip
           </Button>
         }
-      >
-        Every slip you&apos;re part of. <b className="text-neem">Lena</b> is money owed to you, <b className="text-ink">dena</b> is money you owe.
-      </PageHeader>
+      />
 
       {slips && state && slips.some((x) => x.status === "confirmed") && (
         <section className="sheet mb-8 p-4 sm:p-6" aria-label="Open slips by due date">
-          <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-            <h2 className="display text-[19px] font-bold text-ink">Open slips, by due date</h2>
-            <p className="text-[12.5px] text-ink-3">Left of today is late. Each late month costs the borrower a point.</p>
-          </div>
+          <h2 className="display mb-3 text-[19px] font-bold text-ink">By due date</h2>
           <MoneyTimeline slips={slips} actorId={actorId} />
         </section>
       )}

@@ -65,17 +65,14 @@ export default function LakePage() {
           </a>
         }
       >
-        Every fact on Saakh — a slip raised, a “yes”, a payment, a lost point — is one event in a single append-only log. Each event carries the fingerprint (SHA-256) of the one before it, so history can&apos;t be quietly rewritten. Scores, inboxes and the map are all computed from this log.
+        Every fact, chained by SHA-256. History can&apos;t be rewritten.
       </PageHeader>
 
       <Pipeline />
 
       <section className="sheet mt-6 overflow-hidden" aria-label="The chain">
         <div className="flex flex-wrap items-center justify-between gap-3 px-5 pt-5">
-          <div>
-            <h2 className="display text-[19px] font-bold text-ink">The chain, newest on the right</h2>
-            <p className="text-[13px] text-ink-3">Every block carries the fingerprint of the block before it. Change one, and every link after it breaks.</p>
-          </div>
+          <h2 className="display text-[19px] font-bold text-ink">The chain</h2>
           {verify === null || verify === "running" ? (
             <Button variant="primary" loading={verify === "running"} onClick={runVerify}>
               <ShieldCheck size={16} /> {verify === "running" ? "Re-hashing every event…" : "Verify every link"}

@@ -1,7 +1,6 @@
 "use client";
 
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
-import clsx from "clsx";
 import { motion } from "motion/react";
 import type { SlipView } from "@/lib/shared/types";
 import { prettyDay, spanLabel } from "@/lib/shared/dates";
@@ -218,7 +217,6 @@ export function MoneyTimeline({ slips, actorId, height: minH = 250 }: { slips: S
         <Key color="var(--haldi)" label="Due this week" />
         <Key color="var(--neem)" label="Coming to you" />
         <Key color="var(--ink-2)" label="You'll pay" />
-        <span className={clsx("ml-auto", !open.length && "hidden")}>Bigger bubble, bigger amount · tap one to open it</span>
       </div>
     </div>
   );

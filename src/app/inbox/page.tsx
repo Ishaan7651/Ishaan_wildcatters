@@ -33,9 +33,7 @@ export default function InboxPage() {
 
   return (
     <div className="mx-auto max-w-[1040px]">
-      <PageHeader eyebrow={s.me.business.name} title="Inbox" hindi="डाक">
-        Slips other businesses wrote with you, payments to confirm, and notes from the agents.
-      </PageHeader>
+      <PageHeader title="Inbox" hindi="डाक" />
 
       <nav aria-label="Inbox sections" className="mb-10 grid grid-cols-2 gap-2.5 md:grid-cols-4">
         {tiles.map((t) => (

@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import clsx from "clsx";
-import { Check, ChevronDown, Clock3, Moon, NotebookPen, Search, Sun } from "lucide-react";
+import { Check, ChevronDown, Clock3, NotebookPen, Search } from "lucide-react";
 import { addDays, diffDays, weekdayDay } from "@/lib/shared/dates";
 import { postJSON, useAppState, useBusinesses } from "@/lib/client/api";
 import { useApp } from "@/components/providers/Providers";
@@ -11,7 +11,7 @@ import { Popover } from "@/components/ui/overlay";
 import { Avatar, Button, ScoreChip } from "@/components/ui/primitives";
 
 export function TopBar() {
-  const { actorId, theme, toggleTheme, setDiaryOpen } = useApp();
+  const { actorId, setDiaryOpen } = useApp();
   const { data } = useAppState(actorId);
   return (
     <header className="sticky top-0 z-40 border-b border-rule/70 bg-[color-mix(in_oklab,var(--paper)_88%,transparent)] backdrop-blur-md">
@@ -20,10 +20,7 @@ export function TopBar() {
           <span className="grid h-9 -rotate-3 place-items-center rounded-[10px] bg-genda px-2 font-deva text-[22px] leading-none font-bold text-on-genda shadow-[0_2px_0_var(--genda-2)] transition-transform group-hover:rotate-0">
             <span className="translate-y-[2px]">साख</span>
           </span>
-          <span className="hidden leading-none sm:block">
-            <span className="display-wide block text-[17px] text-ink">Saakh</span>
-            <span className="block text-[10.5px] font-medium text-ink-3">your word, on record</span>
-          </span>
+          <span className="display-wide hidden text-[17px] leading-none text-ink sm:block">Saakh</span>
         </Link>
 
         <div className="flex flex-1 items-center justify-end gap-2 sm:gap-2.5">
@@ -39,7 +36,7 @@ export function TopBar() {
                 <span className={clsx("absolute inset-0 rounded-full", data.ai.mode === "ai" ? "bg-neem" : "bg-haldi")} style={{ animation: "pulse-ring 2s ease-out infinite" }} />
                 <span className={clsx("relative size-2 rounded-full", data.ai.mode === "ai" ? "bg-neem" : "bg-haldi")} />
               </span>
-              {data.ai.mode === "ai" ? `AI on · ${data.ai.model.split("/").pop()}` : "Rules mode (no AI key)"}
+              {data.ai.mode === "ai" ? "AI on" : "Rules mode"}
             </span>
           )}
           <TimeMachine />
@@ -51,13 +48,6 @@ export function TopBar() {
             title="Agents' diary"
           >
             <NotebookPen size={18} />
-          </button>
-          <button
-            onClick={toggleTheme}
-            className="grid size-9 place-items-center rounded-full text-ink-2 hover:bg-paper-deep hover:text-ink"
-            aria-label={theme === "dark" ? "Switch to light" : "Switch to dark"}
-          >
-            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
         </div>
       </div>
@@ -85,18 +75,13 @@ function PersonaSwitcher() {
         aria-label="Switch business"
       >
         {me ? <Avatar id={me.id} name={me.name} size={30} className="!rounded-full" /> : <span className="size-[30px] rounded-full skeleton" />}
-        <span className="hidden max-w-[160px] truncate text-left text-[13.5px] leading-tight font-semibold text-ink sm:block">
-          {me?.name ?? "…"}
-          <span className="block text-[11px] font-normal text-ink-3">{me ? `${me.owner} · ${me.city}` : ""}</span>
-        </span>
+        <span className="hidden max-w-[160px] truncate text-left text-[13.5px] font-semibold text-ink sm:block">{me?.name ?? "…"}</span>
         <ChevronDown size={15} className="text-ink-3" />
       </button>
       <Popover open={open} onClose={() => setOpen(false)} className="w-[min(92vw,360px)] overflow-hidden">
         <div className="border-b border-rule p-3">
-          <p className="px-1 text-[12px] text-ink-3">
-            No logins in this demo — pick a seat and act as that business. Switch sides to confirm your own slips.
-          </p>
-          <label className="mt-2.5 flex items-center gap-2 rounded-xl border border-rule-2 bg-sheet-2 px-3 py-2">
+          <p className="eyebrow px-1">Act as</p>
+          <label className="mt-2 flex items-center gap-2 rounded-xl border border-rule-2 bg-sheet-2 px-3 py-2">
             <Search size={15} className="text-ink-3" />
             <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Find a business" className="w-full bg-transparent text-[14px] outline-none" />
           </label>
@@ -217,10 +202,6 @@ function TimeMachine() {
             Back to today
           </Button>
         </div>
-        <p className="mt-4 rounded-xl bg-paper-deep/70 p-3 text-[12.5px] leading-relaxed text-ink-2">
-          Move the Saakh clock to watch what happens when nobody pays. Chowkidar patrols the new day, takes points off late debts and has Dakiya send
-          reminders. Anything you record now is stamped with this date.
-        </p>
       </Popover>
     </div>
   );

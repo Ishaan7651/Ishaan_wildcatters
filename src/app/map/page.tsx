@@ -89,7 +89,7 @@ export default function MapPage() {
   return (
     <div className="mx-auto max-w-[1200px]">
       <PageHeader title="Trust map" hindi="नक्शा">
-        Who owes whom across the market. Arrows run from the borrower to the lender; red ones are overdue and the dashes flow toward whoever is waiting.
+        Who owes whom. Red is overdue.
       </PageHeader>
 
       <div className="mb-4 flex flex-wrap items-center gap-3">
@@ -242,7 +242,7 @@ export default function MapPage() {
             </div>
           ) : (
             <p className="ml-auto w-fit rounded-full border border-rule bg-sheet/90 px-3 py-1.5 text-[12px] text-ink-3 backdrop-blur-sm">
-              Tap a circle to see its debts · the number is its score
+              Tap a circle
             </p>
           )}
         </div>

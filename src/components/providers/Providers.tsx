@@ -40,8 +40,6 @@ export interface ComposerPrefill {
 interface AppCtx {
   actorId: string;
   setActor: (id: string) => void;
-  theme: "light" | "dark";
-  toggleTheme: () => void;
   speakAnswers: boolean;
   setSpeakAnswers: (v: boolean) => void;
   slipId: string | null;
@@ -83,7 +81,6 @@ const DEFAULT_ACTOR = "iyer-spices";
 function AppProvider({ children }: { children: React.ReactNode }) {
   const { mutate } = useSWRConfig();
   const [actorId, setActorId] = useState(DEFAULT_ACTOR);
-  const [theme, setTheme] = useState<"light" | "dark">("light");
   const [speakAnswers, setSpeakState] = useState(true);
   const [slipId, setSlipId] = useState<string | null>(null);
   const [composer, setComposer] = useState<ComposerPrefill | null>(null);
@@ -101,7 +98,6 @@ function AppProvider({ children }: { children: React.ReactNode }) {
       const s = localStorage.getItem("saakh.speak");
       if (s) setSpeakState(s === "1");
     } catch {}
-    setTheme((document.documentElement.dataset.theme as "light" | "dark") ?? "light");
   }, []);
 
   const setActor = useCallback((id: string) => {
@@ -109,17 +105,6 @@ function AppProvider({ children }: { children: React.ReactNode }) {
     try {
       localStorage.setItem("saakh.actor", id);
     } catch {}
-  }, []);
-
-  const toggleTheme = useCallback(() => {
-    setTheme((t) => {
-      const next = t === "dark" ? "light" : "dark";
-      document.documentElement.dataset.theme = next;
-      try {
-        localStorage.setItem("saakh.theme", next);
-      } catch {}
-      return next;
-    });
   }, []);
 
   const setSpeakAnswers = useCallback((v: boolean) => {
@@ -204,8 +189,6 @@ function AppProvider({ children }: { children: React.ReactNode }) {
     () => ({
       actorId,
       setActor,
-      theme,
-      toggleTheme,
       speakAnswers,
       setSpeakAnswers,
       slipId,
@@ -223,7 +206,7 @@ function AppProvider({ children }: { children: React.ReactNode }) {
       diaryOpen,
       setDiaryOpen,
     }),
-    [actorId, setActor, theme, toggleTheme, speakAnswers, setSpeakAnswers, slipId, composer, turns, ask, updateTurn, toasts, toast, dismissToast, refreshAll, diaryOpen],
+    [actorId, setActor, speakAnswers, setSpeakAnswers, slipId, composer, turns, ask, updateTurn, toasts, toast, dismissToast, refreshAll, diaryOpen],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

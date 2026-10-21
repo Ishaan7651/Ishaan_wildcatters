@@ -81,47 +81,12 @@ export function BoloBar({ examples, chips = 3 }: { examples: string[]; chips?: n
         <div className="flex flex-col items-center gap-2 pt-1">
           <MicButton state={voice.state} disabled={!voice.supported || busy} onClick={() => (listening ? voice.stop() : voice.start())} />
           <span className={clsx("text-[11px] font-semibold", listening ? "text-stamp" : "text-ink-3")}>
-            {listening ? "Listening" : voice.state === "transcribing" ? "Writing…" : <>Tap · <span className="font-deva">बोलो</span></>}
+            {listening ? "Listening" : voice.state === "transcribing" ? "Writing…" : <span className="font-deva">बोलो</span>}
           </span>
         </div>
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[13px] font-semibold text-ink-2">
-              {listening ? (
-                <span className="text-stamp">Speak naturally — English, Hindi or both</span>
-              ) : (
-                <>
-                  <span className="sm:hidden">Speak or type</span>
-                  <span className="hidden sm:inline">Say who owes whom, or ask about anyone</span>
-                </>
-              )}
-            </span>
-            <div className="flex items-center gap-1">
-              <div className="flex rounded-full bg-paper-deep p-0.5 text-[11px] font-semibold" role="group" aria-label="Voice language">
-                {(["en-IN", "hi-IN"] as const).map((l) => (
-                  <button
-                    key={l}
-                    onClick={() => setLang(l)}
-                    className={clsx("rounded-full px-2.5 py-0.5 transition-colors", lang === l ? "bg-sheet text-ink shadow-sm" : "text-ink-3 hover:text-ink")}
-                    aria-pressed={lang === l}
-                  >
-                    {l === "en-IN" ? "EN" : <span className="font-deva">हिं</span>}
-                  </button>
-                ))}
-              </div>
-              <button
-                onClick={() => setSpeakAnswers(!speakAnswers)}
-                className="grid size-7 place-items-center rounded-full text-ink-3 hover:bg-paper-deep hover:text-ink"
-                aria-label={speakAnswers ? "Stop reading answers aloud" : "Read answers aloud"}
-                title={speakAnswers ? "Answers are read aloud" : "Answers are silent"}
-              >
-                {speakAnswers ? <Volume2 size={15} /> : <VolumeX size={15} />}
-              </button>
-            </div>
-          </div>
-
-          <div className="relative mt-2">
+          <div className="relative pt-1">
             <textarea
               ref={inputRef}
               rows={1}
@@ -145,7 +110,7 @@ export function BoloBar({ examples, chips = 3 }: { examples: string[]; chips?: n
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: 0.35 }}
-                  className="hand pointer-events-none absolute inset-x-0 top-0 truncate text-[22px] leading-[1.35] text-ink-4 sm:text-[26px]"
+                  className="hand pointer-events-none absolute inset-x-0 top-1 truncate text-[22px] leading-[1.35] text-ink-4 sm:text-[26px]"
                   aria-hidden
                 >
                   {placeholder}
@@ -154,19 +119,28 @@ export function BoloBar({ examples, chips = 3 }: { examples: string[]; chips?: n
             )}
           </div>
 
-          <div className="mt-2.5 flex items-center gap-3">
-            <p className="min-w-0 flex-1 truncate text-[12px] text-ink-3">
-              {voice.error ? (
-                <span className="text-stamp">{voice.error}</span>
-              ) : listening ? (
-                "Tap the mic again when you're done."
-              ) : (
-                <>
-                  <span className="hidden sm:inline">Press <b className="text-ink-2">/</b> to type · </span>
-                  <b className="text-ink-2">Enter</b> to send
-                </>
-              )}
-            </p>
+          <div className="mt-2.5 flex items-center gap-1">
+            <div className="flex rounded-full bg-paper-deep p-0.5 text-[11px] font-semibold" role="group" aria-label="Voice language">
+              {(["en-IN", "hi-IN"] as const).map((l) => (
+                <button
+                  key={l}
+                  onClick={() => setLang(l)}
+                  className={clsx("rounded-full px-2.5 py-0.5 transition-colors", lang === l ? "bg-sheet text-ink shadow-sm" : "text-ink-3 hover:text-ink")}
+                  aria-pressed={lang === l}
+                >
+                  {l === "en-IN" ? "EN" : <span className="font-deva">हिं</span>}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setSpeakAnswers(!speakAnswers)}
+              className="grid size-7 place-items-center rounded-full text-ink-3 hover:bg-paper-deep hover:text-ink"
+              aria-label={speakAnswers ? "Stop reading answers aloud" : "Read answers aloud"}
+              title={speakAnswers ? "Answers are read aloud" : "Answers are silent"}
+            >
+              {speakAnswers ? <Volume2 size={15} /> : <VolumeX size={15} />}
+            </button>
+            <p className="ml-2 min-w-0 flex-1 truncate text-[12px] text-stamp">{voice.error}</p>
             <button
               onClick={submit}
               disabled={!text.trim() || busy || listening}
@@ -188,7 +162,6 @@ export function BoloBar({ examples, chips = 3 }: { examples: string[]; chips?: n
 
       {chips > 0 && !listening && (
         <div className="relative flex flex-wrap items-center gap-1.5 border-t border-rule/80 bg-sheet-2/80 px-4 py-3 sm:px-6">
-          <span className="mr-1 text-[12px] font-semibold text-ink-3">Try</span>
           {examples.slice(0, chips).map((e) => (
             <button
               key={e}
@@ -200,7 +173,7 @@ export function BoloBar({ examples, chips = 3 }: { examples: string[]; chips?: n
             </button>
           ))}
           <button onClick={() => openComposer({})} className="ml-auto flex items-center gap-1.5 rounded-full px-2 py-1 text-[12.5px] font-medium text-ink-3 hover:bg-paper-deep hover:text-ink">
-            <PenLine size={13} /> Write one by hand
+            <PenLine size={13} /> Write
           </button>
         </div>
       )}

@@ -43,7 +43,6 @@ function ProfileView({ p, today, isMe }: { p: Profile; today: string; isMe: bool
       <section className="grid items-center gap-8 pt-2 pb-8 md:grid-cols-[auto_1fr] md:pt-6">
         <div className="mx-auto">
           <ScoreRing score={p.score.score} band={p.score.band} penalties={p.score.penalties} size={248} />
-          <p className="mt-2 text-center text-[12px] text-ink-3">Each red mark is one late month — hover or tap it</p>
         </div>
         <div className="min-w-0">
           <div className="flex items-center gap-3">
@@ -130,7 +129,6 @@ function ProfileView({ p, today, isMe }: { p: Profile; today: string; isMe: bool
         <section className="sheet p-5">
           <SectionTitle hindi="इतिहास">Score over time</SectionTitle>
           <ScoreHistory points={p.history} />
-          <p className="mt-3 text-[12.5px] text-ink-3">Started at 100 on {prettyDay(p.history[0].day)}. Each step down is one late month.</p>
         </section>
       </div>
 
