@@ -122,7 +122,31 @@ function sql() {
     idle_timeout: 20,
     ssl: /@(localhost|127\.0\.0\.1)[:/]/.test(DB_URL) ? false : "require",
     onnotice: () => {},
+    // ...nor answer two queries in flight on one connection: they hang forever
+    // and wedge the pool. One query per connection at a time. (Not in the typings.)
+    ...({ max_pipeline: 0 } as object),
   }));
+}
+
+/**
+ * `sql.begin()` can't reserve its connection while pipelining is off, so
+ * transactions take one with `reserve()` and run begin/commit themselves.
+ */
+async function transaction<T>(fn: (tx: postgres.ReservedSql) => Promise<T>): Promise<T> {
+  const tx = await sql().reserve();
+  try {
+    await tx`begin`;
+    try {
+      const out = await fn(tx);
+      await tx`commit`;
+      return out;
+    } catch (e) {
+      await tx`rollback`;
+      throw e;
+    }
+  } finally {
+    tx.release();
+  }
 }
 
 // Its own schema, with row-level security on and no policies, so Supabase's
@@ -144,7 +168,7 @@ function ensureSchema() {
   }));
 }
 
-type Q = postgres.Sql | postgres.TransactionSql;
+type Q = postgres.Sql | postgres.ReservedSql;
 
 /** Bring the mirror up to date: only events it hasn't seen, unless the lake was reset. */
 async function pull(q: Q): Promise<Mirror | null> {
@@ -172,7 +196,7 @@ function mirror(): Mirror {
 }
 
 /** Replaces everything with a fresh demo market. Call inside a locked transaction. */
-async function writeSeed(tx: postgres.TransactionSql) {
+async function writeSeed(tx: postgres.ReservedSql) {
   g.__saakhMirror = undefined;
   const seed = buildSeed(new Date());
   const events = chain(seed.events, GENESIS, 0);
@@ -202,7 +226,7 @@ export async function openLake() {
   }
   await ensureSchema();
   if (await pull(sql())) return;
-  await sql().begin(async (tx) => {
+  await transaction(async (tx) => {
     await tx`select pg_advisory_xact_lock(${LOCK})`;
     const [meta] = await tx`select 1 from saakh.meta where id = 1`;
     if (!meta) await writeSeed(tx);
@@ -249,7 +273,7 @@ export async function appendEvents(drafts: EventDraft[]): Promise<LakeEvent[]> {
     return out;
   }
   // Chain onto the true head: lock, catch up on anything other instances wrote, then insert.
-  const { m, out } = await sql().begin(async (tx) => {
+  const { m, out } = await transaction(async (tx) => {
     await tx`select pg_advisory_xact_lock(${LOCK})`;
     const m = await pull(tx);
     if (!m) throw new Error("The lake was cleared mid-write. Try again.");
@@ -365,7 +389,7 @@ export function today(): string {
 export async function resetLake() {
   if (DB_URL) {
     await ensureSchema();
-    await sql().begin(async (tx) => {
+    await transaction(async (tx) => {
       await tx`select pg_advisory_xact_lock(${LOCK})`;
       await writeSeed(tx);
     });
