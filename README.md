@@ -133,7 +133,7 @@ It's a standard Next.js 16 app. The ledger lives in one of two places:
 
 **Vercel + Supabase (both free):**
 
-1. Create a [Supabase](https://supabase.com) project in **South Asia (Mumbai)**, to sit next to the Vercel functions (`vercel.json` pins them to `bom1`, Mumbai).
+1. Create a [Supabase](https://supabase.com) project in **Southeast Asia (Singapore)**, to sit next to the Vercel functions (`vercel.json` pins them to `sin1`, Singapore). If you pick another region, change `vercel.json` to the matching Vercel region.
 2. In Supabase, click **Connect** and copy the **Transaction pooler** connection string (port 6543), with your database password filled in.
 3. On [Vercel](https://vercel.com/new), import this repository. Under Environment Variables add `DATABASE_URL` (that string) and `OPENROUTER_API_KEY`. Optionally add `SAAKH_PUBLIC_URL` with the deployed address.
 4. Deploy. The first page load creates the tables and the demo market.
