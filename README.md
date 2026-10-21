@@ -138,6 +138,8 @@ It's a standard Next.js 16 app. The ledger lives in one of two places:
 3. On [Vercel](https://vercel.com/new), import this repository. Under Environment Variables add `DATABASE_URL` (that string) and `OPENROUTER_API_KEY`. Optionally add `SAAKH_PUBLIC_URL` with the deployed address.
 4. Deploy. The first page load creates the tables and the demo market.
 
+To carry over a ledger you built locally instead of starting fresh, put the same `DATABASE_URL` in `.env.local` and run `npm run import-lake`. It checks the local hash chain, uploads `.data/` (events, agent runs and the Saakh clock), and reads it back to confirm the chain arrived intact. If the database already has a ledger it stops, unless you add `-- --replace`.
+
 Free Supabase projects pause after a week with no traffic. The data is kept, and **Restore** in the Supabase dashboard brings it back. The agent routes allow up to 300 s, the Hobby limit with Fluid compute (on by default).
 
 Writes take a Postgres advisory lock and catch up on anything other instances wrote before chaining, so the hash chain stays a single line however many instances are serving. Chowkidar's daily patrol is claimed in the database, so it runs once per Saakh day.
