@@ -22,6 +22,8 @@ export type BizRow = BizLite & {
   invited: boolean;
   owes: { count: number; amount: number; overdueCount: number; overdueAmount: number; oldestOverdueDays: number };
   owed: { count: number; amount: number; overdueCount: number; overdueAmount: number };
+  /** Requests waiting on this business's answer. */
+  pending: number;
 };
 
 export function useAppState(actor: string | null) {

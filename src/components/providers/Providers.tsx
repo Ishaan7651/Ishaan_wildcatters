@@ -5,6 +5,7 @@ import { SWRConfig, useSWRConfig } from "swr";
 import { MotionConfig } from "motion/react";
 import type { AgentStep, BoloEvent, BoloResult, Intent } from "@/lib/shared/types";
 import { speak, stopSpeaking } from "@/lib/client/speak";
+import { playSound, type SoundKind } from "@/lib/client/sounds";
 
 export interface Turn {
   id: string;
@@ -30,6 +31,11 @@ export interface Toast {
   body?: string;
   tone?: "default" | "good" | "warn" | "bad";
   agent?: AgentStep["agent"];
+  /** Played with the toast when sounds are on. */
+  sound?: SoundKind;
+  /** A notification pop-up: shown top-right, larger, and stays a little longer. */
+  alert?: boolean;
+  action?: { label: string; slipId?: string; href?: string };
 }
 
 export interface ComposerPrefill {
@@ -42,6 +48,8 @@ interface AppCtx {
   setActor: (id: string) => void;
   speakAnswers: boolean;
   setSpeakAnswers: (v: boolean) => void;
+  soundsOn: boolean;
+  setSoundsOn: (v: boolean) => void;
   slipId: string | null;
   openSlip: (id: string | null) => void;
   composer: ComposerPrefill | null;
@@ -82,6 +90,7 @@ function AppProvider({ children }: { children: React.ReactNode }) {
   const { mutate } = useSWRConfig();
   const [actorId, setActorId] = useState(DEFAULT_ACTOR);
   const [speakAnswers, setSpeakState] = useState(true);
+  const [soundsOn, setSoundsState] = useState(true);
   const [slipId, setSlipId] = useState<string | null>(null);
   const [composer, setComposer] = useState<ComposerPrefill | null>(null);
   const [turns, setTurns] = useState<Turn[]>([]);
@@ -90,6 +99,8 @@ function AppProvider({ children }: { children: React.ReactNode }) {
   const toastSeq = useRef(0);
   const speakRef = useRef(speakAnswers);
   speakRef.current = speakAnswers;
+  const soundsRef = useRef(soundsOn);
+  soundsRef.current = soundsOn;
 
   useEffect(() => {
     try {
@@ -97,6 +108,8 @@ function AppProvider({ children }: { children: React.ReactNode }) {
       if (a) setActorId(a);
       const s = localStorage.getItem("saakh.speak");
       if (s) setSpeakState(s === "1");
+      const snd = localStorage.getItem("saakh.sounds");
+      if (snd) setSoundsState(snd === "1");
     } catch {}
   }, []);
 
@@ -115,10 +128,19 @@ function AppProvider({ children }: { children: React.ReactNode }) {
     } catch {}
   }, []);
 
+  const setSoundsOn = useCallback((v: boolean) => {
+    setSoundsState(v);
+    if (v) playSound("pop");
+    try {
+      localStorage.setItem("saakh.sounds", v ? "1" : "0");
+    } catch {}
+  }, []);
+
   const toast = useCallback((t: Omit<Toast, "id">) => {
     const id = ++toastSeq.current;
-    setToasts((xs) => [...xs.slice(-3), { ...t, id }]);
-    setTimeout(() => setToasts((xs) => xs.filter((x) => x.id !== id)), 5200);
+    setToasts((xs) => [...xs.slice(-4), { ...t, id }]);
+    if (t.sound && soundsRef.current) playSound(t.sound);
+    setTimeout(() => setToasts((xs) => xs.filter((x) => x.id !== id)), t.alert ? 9000 : 5200);
   }, []);
   const dismissToast = useCallback((id: number) => setToasts((xs) => xs.filter((x) => x.id !== id)), []);
 
@@ -191,6 +213,8 @@ function AppProvider({ children }: { children: React.ReactNode }) {
       setActor,
       speakAnswers,
       setSpeakAnswers,
+      soundsOn,
+      setSoundsOn,
       slipId,
       openSlip: setSlipId,
       composer,
@@ -206,7 +230,7 @@ function AppProvider({ children }: { children: React.ReactNode }) {
       diaryOpen,
       setDiaryOpen,
     }),
-    [actorId, setActor, speakAnswers, setSpeakAnswers, slipId, composer, turns, ask, updateTurn, toasts, toast, dismissToast, refreshAll, diaryOpen],
+    [actorId, setActor, speakAnswers, setSpeakAnswers, soundsOn, setSoundsOn, slipId, composer, turns, ask, updateTurn, toasts, toast, dismissToast, refreshAll, diaryOpen],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

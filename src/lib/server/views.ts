@@ -246,8 +246,19 @@ export function profileOf(world: World, bizId: string): Profile | null {
 export function allBusinesses(world: World) {
   return [...world.businesses.values()].map((b) => {
     const st = statsFor(world, b.id);
-    return { ...lite(world, b), market: b.market, invited: !!b.invitedBy, owes: st.owes, owed: st.owed };
+    return { ...lite(world, b), market: b.market, invited: !!b.invitedBy, owes: st.owes, owed: st.owed, pending: pendingFor(world, b.id) };
   });
+}
+
+/** Slips waiting on this business's word: to confirm, payments to acknowledge, counters to review. */
+export function pendingFor(world: World, bizId: string): number {
+  let n = 0;
+  for (const s of world.slips.values()) {
+    if (s.status === "awaiting" && confirmerOf(s) === bizId) n++;
+    else if ((s.status === "countered" || s.status === "disputed") && raiserOf(s) === bizId) n++;
+    else if (s.status === "confirmed" && s.payment && !s.payment.acknowledged && s.creditorId === bizId) n++;
+  }
+  return n;
 }
 
 // ---- The actor's home screen ----

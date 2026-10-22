@@ -31,6 +31,7 @@ export function useRaiseSlip() {
       const other = p.direction === "they_owe_me" ? r.slip.debtor.name : r.slip.creditor.name;
       toast({
         agent: "gawah",
+        sound: "pop",
         title: `Sent to ${other} for confirmation`,
         body: r.invited ? `${other} isn't on Saakh yet — the Witness sent them an invite with the slip.` : "The Witness is asking them to confirm. It counts once they agree.",
       });
@@ -45,6 +46,14 @@ export function useRaiseSlip() {
   };
   return { raise, busy };
 }
+
+const DUE_IN: [string, number][] = [
+  ["1 week", 7],
+  ["15 days", 15],
+  ["1 month", 30],
+  ["2 months", 60],
+  ["3 months", 90],
+];
 
 /** The no-voice way in: a plain form that writes the same parchi. */
 export function Composer() {
@@ -172,7 +181,47 @@ function ComposerForm({ prefill, today }: { prefill: ComposerPrefill; today: str
               className="hand w-full bg-transparent text-[28px] outline-none"
             />
           </div>
-          {amt > 0 && <p className="mt-1 text-[12px] text-ink-3 italic">{rupeesInWords(amt)}</p>}
+          <div className="mt-2 flex flex-wrap items-center gap-1.5">
+            {[500, 1000, 5000, 10000, 50000].map((n) => (
+              <button
+                type="button"
+                key={n}
+                onClick={() => setAmount(String(Math.min(999_999_999, (amt || 0) + n)))}
+                className="rounded-full border border-rule-2 bg-sheet px-3 py-1 text-[13px] font-semibold text-ink-2 tabular transition-colors hover:border-genda-2 hover:bg-genda-soft active:scale-95"
+              >
+                +₹{n.toLocaleString("en-IN")}
+              </button>
+            ))}
+            {amt > 0 && (
+              <button type="button" onClick={() => setAmount("")} className="px-2 py-1 text-[12.5px] text-ink-3 hover:text-stamp">
+                Clear
+              </button>
+            )}
+          </div>
+          {amt > 0 && <p className="mt-1.5 text-[12px] text-ink-3 italic">{rupeesInWords(amt)}</p>}
+        </div>
+
+        <div>
+          <p className="eyebrow">Due in</p>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {DUE_IN.map(([label, days]) => {
+              const d = addDays(today, days);
+              return (
+                <button
+                  type="button"
+                  key={label}
+                  onClick={() => setDue(d)}
+                  aria-pressed={due === d}
+                  className={clsx(
+                    "rounded-full border px-3 py-1 text-[13px] font-semibold transition-colors active:scale-95",
+                    due === d ? "border-mor bg-mor text-on-mor" : "border-rule-2 bg-sheet text-ink-2 hover:border-mor/50 hover:bg-mor-soft/60",
+                  )}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3">

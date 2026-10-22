@@ -10,6 +10,7 @@ import { BoloBar } from "@/components/bolo/BoloBar";
 import { Thread } from "@/components/bolo/Thread";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { MoneyTimeline } from "@/components/home/MoneyTimeline";
+import { QuickSlip } from "@/components/home/QuickSlip";
 import { Taraazu } from "@/components/home/Taraazu";
 import { WaitingCards, waitingItems } from "@/components/home/WaitingCards";
 import { ScoreRing } from "@/components/score/ScoreRing";
@@ -41,12 +42,15 @@ export default function BoloPage() {
       <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_350px] xl:gap-10">
         <div className="min-w-0 space-y-8">
           <Greeting s={s} />
-          <BoloBar examples={examples} chips={2} />
+          <div className="space-y-3">
+            <BoloBar examples={examples} chips={2} />
+            <QuickSlip slips={slips} />
+          </div>
 
           {s && (
             <div className="grid gap-4 md:grid-cols-2 xl:hidden">
-              <ScoreCard s={s} />
               <ScaleCard s={s} />
+              <ScoreCard s={s} />
             </div>
           )}
 
@@ -95,13 +99,13 @@ export default function BoloPage() {
           <div className="sticky top-[88px] space-y-5">
             {s ? (
               <>
-                <ScoreCard s={s} />
                 <ScaleCard s={s} />
+                <ScoreCard s={s} />
               </>
             ) : (
               <>
-                <div className="h-64 skeleton" />
                 <div className="h-80 skeleton" />
+                <div className="h-64 skeleton" />
               </>
             )}
           </div>

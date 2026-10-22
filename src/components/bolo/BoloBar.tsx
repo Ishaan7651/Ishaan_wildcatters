@@ -79,7 +79,7 @@ export function BoloBar({ examples, chips = 3 }: { examples: string[]; chips?: n
 
       <div className="relative flex items-start gap-4 p-4 sm:gap-6 sm:p-6">
         <div className="flex flex-col items-center gap-2 pt-1">
-          <MicButton state={voice.state} disabled={!voice.supported || busy} onClick={() => (listening ? voice.stop() : voice.start())} />
+          <MicButton state={voice.state} disabled={!voice.supported || busy || voice.state === "transcribing"} onClick={() => (listening ? voice.stop() : voice.start())} />
           <span className={clsx("text-[11px] font-semibold", listening ? "text-stamp" : "text-ink-3")}>
             {listening ? "Listening" : voice.state === "transcribing" ? "Writing…" : <span className="font-deva">बोलो</span>}
           </span>

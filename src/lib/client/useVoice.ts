@@ -24,16 +24,24 @@ function getSR(): (new () => SR) | null {
 }
 
 const BARS = 56;
+/** Stops on its own after this much quiet following speech… */
+const SILENCE_MS = 1800;
+/** …or if nothing is said at all, or the note runs long. */
+const NO_SPEECH_MS = 9000;
+const MAX_MS = 30_000;
+const SPEECH_LEVEL = 0.08;
 
 const noop = () => () => {};
 function canRecord() {
-  return !!getSR() || (!!navigator.mediaDevices && typeof MediaRecorder !== "undefined");
+  return !!navigator.mediaDevices && (typeof MediaRecorder !== "undefined" || !!getSR());
 }
 
 /**
- * Voice input. Uses the browser's own speech recognition where it exists
- * (Chrome, Edge, Safari) for live words-as-you-speak; elsewhere records a short
- * WAV and has an audio model transcribe it. Either way, shows a live level meter.
+ * Voice input. Always records the mic, and also runs the browser's own speech
+ * recognition where it exists for live words-as-you-speak. Many Chromium
+ * browsers (Brave, Arc, Electron apps, some Edge setups) expose that API but it
+ * fails with a "network" error, so when it errors or hears nothing the
+ * recording goes to an audio model instead. Stops itself after a pause.
  */
 export function useVoice({ lang, onFinal }: { lang: "en-IN" | "hi-IN"; onFinal: (text: string) => void }) {
   const [state, setState] = useState<State>("idle");
@@ -50,6 +58,9 @@ export function useVoice({ lang, onFinal }: { lang: "en-IN" | "hi-IN"; onFinal: 
   const chunksRef = useRef<Blob[]>([]);
   const finalRef = useRef("");
   const interimRef = useRef("");
+  const srDoneRef = useRef<Promise<void>>(Promise.resolve());
+  const stoppingRef = useRef(false);
+  const stopRef = useRef<() => void>(() => {});
   const onFinalRef = useRef(onFinal);
   useEffect(() => {
     onFinalRef.current = onFinal;
@@ -78,15 +89,25 @@ export function useVoice({ lang, onFinal }: { lang: "en-IN" | "hi-IN"; onFinal: 
     const buf = new Uint8Array(an.fftSize);
     let trace: number[] = Array(BARS).fill(0);
     let frame = 0;
+    const began = performance.now();
+    let spoke = false;
+    let lastLoud = began;
     const tick = () => {
       rafRef.current = requestAnimationFrame(tick);
       if (frame++ % 3) return;
       an.getByteTimeDomainData(buf);
       let sum = 0;
       for (const v of buf) sum += ((v - 128) / 128) ** 2;
-      const rms = Math.sqrt(sum / buf.length);
-      trace = [...trace.slice(1), Math.min(1, rms * 4.5)];
+      const level = Math.min(1, Math.sqrt(sum / buf.length) * 4.5);
+      trace = [...trace.slice(1), level];
       setLevels(trace);
+      const now = performance.now();
+      if (level > SPEECH_LEVEL) {
+        spoke = true;
+        lastLoud = now;
+      }
+      if (spoke ? now - lastLoud > SILENCE_MS : now - began > NO_SPEECH_MS) stopRef.current();
+      else if (now - began > MAX_MS) stopRef.current();
     };
     tick();
     return stream;
@@ -112,19 +133,77 @@ export function useVoice({ lang, onFinal }: { lang: "en-IN" | "hi-IN"; onFinal: 
     }
   }, []);
 
+  /** Stop listening, then use the live transcript if there is one, else send the recording. */
+  const stop = useCallback(() => {
+    if (stoppingRef.current) return;
+    stoppingRef.current = true;
+    cancelAnimationFrame(rafRef.current);
+    recRef.current?.stop();
+    const mr = mediaRef.current;
+    const recorded = new Promise<Blob | null>((resolve) => {
+      if (!mr || mr.state === "inactive") return resolve(null);
+      mr.onstop = () => resolve(new Blob(chunksRef.current, { type: mr.mimeType || "audio/webm" }));
+      mr.stop();
+    });
+    // The recognizer can take a moment to hand over its last words.
+    const settled = Promise.race([srDoneRef.current, new Promise<void>((r) => setTimeout(r, 1500))]);
+    Promise.all([recorded, settled]).then(([blob]) => {
+      stopMeter();
+      recRef.current = null;
+      mediaRef.current = null;
+      setInterim("");
+      const text = (finalRef.current || interimRef.current).trim();
+      if (text) {
+        setState("idle");
+        onFinalRef.current(text);
+      } else if (blob && blob.size > 1200) {
+        transcribe(blob);
+      } else {
+        setState("idle");
+        setError("Didn't hear anything — tap the mic and speak.");
+      }
+    });
+  }, [stopMeter, transcribe]);
+  useEffect(() => {
+    stopRef.current = stop;
+  }, [stop]);
+
   const start = useCallback(async () => {
     setError(null);
     setInterim("");
     finalRef.current = "";
     interimRef.current = "";
-    const SRC = getSR();
+    stoppingRef.current = false;
+    let stream: MediaStream;
     try {
-      const stream = await startMeter();
-      if (SRC) {
+      stream = await startMeter();
+    } catch (e) {
+      stopMeter();
+      setState("idle");
+      setError(
+        (e as DOMException)?.name === "NotFoundError"
+          ? "No microphone found. Plug one in, or type instead."
+          : "The microphone is blocked. Allow it from the icon in the address bar, or type instead.",
+      );
+      return;
+    }
+
+    if (typeof MediaRecorder !== "undefined") {
+      const mr = new MediaRecorder(stream);
+      chunksRef.current = [];
+      mr.ondataavailable = (e) => e.data.size && chunksRef.current.push(e.data);
+      mediaRef.current = mr;
+      mr.start(250);
+    }
+
+    srDoneRef.current = Promise.resolve();
+    const SRC = getSR();
+    if (SRC) {
+      try {
         const rec = new SRC();
         rec.lang = lang;
         rec.interimResults = true;
-        rec.continuous = false;
+        rec.continuous = true;
         rec.maxAlternatives = 1;
         rec.onresult = (e) => {
           let fin = "";
@@ -138,56 +217,35 @@ export function useVoice({ lang, onFinal }: { lang: "en-IN" | "hi-IN"; onFinal: 
           interimRef.current = inter;
           setInterim((finalRef.current + " " + inter).trim());
         };
-        rec.onerror = (e) => {
-          if (e.error === "not-allowed" || e.error === "service-not-allowed") setError("The microphone is blocked. Allow it in the address bar, or type instead.");
-          else if (e.error === "no-speech") setError("Didn't hear anything — tap the mic and speak.");
-          else if (e.error !== "aborted") setError(`Voice stopped (${e.error}). You can type instead.`);
-        };
-        rec.onend = () => {
-          stopMeter();
-          setState("idle");
-          const text = (finalRef.current || interimRef.current).trim();
-          setInterim("");
-          if (text) onFinalRef.current(text);
-        };
+        let ended: () => void = () => {};
+        srDoneRef.current = new Promise<void>((r) => (ended = r));
+        // Its errors (network, not-allowed, …) don't matter: the recording is the fallback.
+        rec.onerror = () => {};
+        rec.onend = () => ended();
         recRef.current = rec;
         rec.start();
-        setState("listening");
-      } else {
-        const mr = new MediaRecorder(stream);
-        chunksRef.current = [];
-        mr.ondataavailable = (e) => e.data.size && chunksRef.current.push(e.data);
-        mr.onstop = () => {
-          stopMeter();
-          const blob = new Blob(chunksRef.current, { type: mr.mimeType || "audio/webm" });
-          transcribe(blob);
-        };
-        mediaRef.current = mr;
-        mr.start();
-        setState("listening");
+      } catch {
+        recRef.current = null;
+        srDoneRef.current = Promise.resolve();
       }
-    } catch {
+    }
+
+    if (!mediaRef.current && !recRef.current) {
       stopMeter();
-      setState("idle");
-      setError("The microphone is blocked or missing. Allow it in the address bar, or type instead.");
+      setError("Voice isn't available in this browser. Type instead.");
+      return;
     }
-  }, [lang, startMeter, stopMeter, transcribe]);
+    setState("listening");
+  }, [lang, startMeter, stopMeter]);
 
-  const stop = useCallback(() => {
-    if (recRef.current) {
-      recRef.current.stop();
-      recRef.current = null;
-    }
-    if (mediaRef.current && mediaRef.current.state !== "inactive") {
-      mediaRef.current.stop();
-      mediaRef.current = null;
-    }
-  }, []);
-
-  useEffect(() => () => {
-    recRef.current?.abort();
-    stopMeter();
-  }, [stopMeter]);
+  useEffect(
+    () => () => {
+      recRef.current?.abort();
+      if (mediaRef.current && mediaRef.current.state !== "inactive") mediaRef.current.stop();
+      stopMeter();
+    },
+    [stopMeter],
+  );
 
   return { state, interim, levels, error, supported, start, stop, clearError: () => setError(null) };
 }

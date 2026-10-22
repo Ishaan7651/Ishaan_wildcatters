@@ -292,6 +292,15 @@ body::before {
   85% { transform: translateY(-6px); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
   100% { opacity: 1; transform: translateY(0); }
 }
+/* A bell swinging after it's struck. */
+@keyframes ring {
+  0%, 100% { transform: rotate(0); }
+  10% { transform: rotate(18deg); }
+  25% { transform: rotate(-15deg); }
+  40% { transform: rotate(11deg); }
+  55% { transform: rotate(-7deg); }
+  70% { transform: rotate(3deg); }
+}
 @keyframes bob {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-3px); }

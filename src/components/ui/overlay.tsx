@@ -5,7 +5,8 @@ import { createPortal } from "react-dom";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "motion/react";
 import { X } from "lucide-react";
-import { useApp } from "@/components/providers/Providers";
+import { useRouter } from "next/navigation";
+import { useApp, type Toast } from "@/components/providers/Providers";
 import { AgentGlyph } from "./primitives";
 
 /** Anchored panel that closes on outside click or Escape. */
@@ -125,41 +126,75 @@ export function Sheet({
 }
 
 export function Toaster() {
-  const { toasts, dismissToast } = useApp();
+  const { toasts } = useApp();
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-24 z-[70] flex flex-col items-center gap-2 px-4 md:bottom-6">
-      <AnimatePresence initial={false}>
-        {toasts.map((t) => (
-          <motion.div
-            key={t.id}
-            layout
-            initial={{ opacity: 0, y: 16, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 8, scale: 0.97 }}
-            transition={{ type: "spring", stiffness: 420, damping: 32 }}
-            className="pointer-events-auto flex w-full max-w-md items-start gap-3 rounded-2xl border border-rule bg-sheet px-4 py-3 shadow-[var(--shadow-lift)]"
-            role="status"
-          >
-            {t.agent ? (
-              <AgentGlyph agent={t.agent} size={28} />
-            ) : (
-              <span
-                className={clsx(
-                  "mt-1.5 size-2 shrink-0 rounded-full",
-                  t.tone === "good" ? "bg-neem" : t.tone === "warn" ? "bg-haldi" : t.tone === "bad" ? "bg-stamp" : "bg-mor",
-                )}
-              />
+    <>
+      {/* Notification pop-ups: top-right on desktop, top on phones. */}
+      <div className="pointer-events-none fixed inset-x-0 top-[72px] z-[70] flex flex-col items-center gap-2 px-3 md:inset-x-auto md:right-5 md:items-end">
+        <AnimatePresence initial={false}>
+          {toasts.filter((t) => t.alert).map((t) => (
+            <ToastCard key={t.id} t={t} alert />
+          ))}
+        </AnimatePresence>
+      </div>
+      <div className="pointer-events-none fixed inset-x-0 bottom-24 z-[70] flex flex-col items-center gap-2 px-4 md:bottom-6">
+        <AnimatePresence initial={false}>
+          {toasts.filter((t) => !t.alert).map((t) => (
+            <ToastCard key={t.id} t={t} />
+          ))}
+        </AnimatePresence>
+      </div>
+    </>
+  );
+}
+
+const TONE_BAR = { default: "bg-mor", good: "bg-neem", warn: "bg-genda", bad: "bg-stamp" } as const;
+
+function ToastCard({ t, alert }: { t: Toast; alert?: boolean }) {
+  const { dismissToast, openSlip } = useApp();
+  const router = useRouter();
+  const tone = t.tone ?? "default";
+  return (
+    <motion.div
+      layout
+      initial={alert ? { opacity: 0, x: 60, scale: 0.94 } : { opacity: 0, y: 16, scale: 0.97 }}
+      animate={alert ? { opacity: 1, x: 0, scale: 1 } : { opacity: 1, y: 0, scale: 1 }}
+      exit={alert ? { opacity: 0, x: 40, scale: 0.96 } : { opacity: 0, y: 8, scale: 0.97 }}
+      transition={{ type: "spring", stiffness: 420, damping: 30 }}
+      className={clsx(
+        "pointer-events-auto relative flex w-full items-start gap-3 overflow-hidden rounded-2xl border bg-sheet py-3 pr-3 shadow-[var(--shadow-lift)]",
+        alert ? "max-w-[400px] border-rule-2 pl-5" : "max-w-md border-rule pl-4",
+      )}
+      role={alert ? "alert" : "status"}
+    >
+      {alert && <span className={clsx("absolute inset-y-0 left-0 w-1.5", TONE_BAR[tone])} aria-hidden />}
+      {t.agent ? (
+        <AgentGlyph agent={t.agent} size={alert ? 34 : 28} />
+      ) : (
+        <span className={clsx("mt-1.5 size-2 shrink-0 rounded-full", TONE_BAR[tone])} />
+      )}
+      <div className="min-w-0 flex-1">
+        <p className={clsx("font-semibold text-ink", alert ? "text-[14.5px]" : "text-[14px]")}>{t.title}</p>
+        {t.body && <p className="mt-0.5 line-clamp-3 text-[13px] text-ink-2">{t.body}</p>}
+        {t.action && (
+          <button
+            onClick={() => {
+              if (t.action?.slipId) openSlip(t.action.slipId);
+              else if (t.action?.href) router.push(t.action.href);
+              dismissToast(t.id);
+            }}
+            className={clsx(
+              "mt-2 rounded-full px-3.5 py-1 text-[12.5px] font-bold transition-transform hover:scale-105",
+              tone === "bad" ? "bg-stamp text-white" : tone === "good" ? "bg-neem text-white" : "bg-genda text-on-genda",
             )}
-            <div className="min-w-0 flex-1">
-              <p className="text-[14px] font-semibold text-ink">{t.title}</p>
-              {t.body && <p className="mt-0.5 text-[13px] text-ink-2">{t.body}</p>}
-            </div>
-            <button onClick={() => dismissToast(t.id)} className="text-ink-4 hover:text-ink" aria-label="Dismiss">
-              <X size={15} />
-            </button>
-          </motion.div>
-        ))}
-      </AnimatePresence>
-    </div>
+          >
+            {t.action.label}
+          </button>
+        )}
+      </div>
+      <button onClick={() => dismissToast(t.id)} className="text-ink-4 hover:text-ink" aria-label="Dismiss">
+        <X size={15} />
+      </button>
+    </motion.div>
   );
 }

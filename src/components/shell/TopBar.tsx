@@ -9,6 +9,7 @@ import { postJSON, useAppState, useBusinesses } from "@/lib/client/api";
 import { useApp } from "@/components/providers/Providers";
 import { Popover } from "@/components/ui/overlay";
 import { Avatar, Button, ScoreChip } from "@/components/ui/primitives";
+import { NotificationBell } from "./Notifications";
 
 export function TopBar() {
   const { actorId, setDiaryOpen } = useApp();
@@ -40,6 +41,7 @@ export function TopBar() {
             </span>
           )}
           <TimeMachine />
+          <NotificationBell />
           <PersonaSwitcher />
           <button
             onClick={() => setDiaryOpen(true)}
@@ -61,6 +63,7 @@ function PersonaSwitcher() {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const me = list?.find((b) => b.id === actorId);
+  const others = list?.filter((b) => b.id !== actorId && b.pending > 0).length ?? 0;
   const filtered = useMemo(
     () => (list ?? []).filter((b) => !q || `${b.name} ${b.owner} ${b.city}`.toLowerCase().includes(q.toLowerCase())),
     [list, q],
@@ -74,13 +77,25 @@ function PersonaSwitcher() {
         aria-expanded={open}
         aria-label="Switch business"
       >
-        {me ? <Avatar id={me.id} name={me.name} size={30} className="!rounded-full" /> : <span className="size-[30px] rounded-full skeleton" />}
+        <span className="relative">
+          {me ? <Avatar id={me.id} name={me.name} size={30} className="!rounded-full" /> : <span className="block size-[30px] rounded-full skeleton" />}
+          {!!others && (
+            <span className="absolute -top-1 -right-1 size-3 rounded-full bg-stamp ring-2 ring-sheet" title={`${others} other ${others === 1 ? "business has" : "businesses have"} unanswered requests`} />
+          )}
+        </span>
         <span className="hidden max-w-[160px] truncate text-left text-[13.5px] font-semibold text-ink sm:block">{me?.name ?? "…"}</span>
         <ChevronDown size={15} className="text-ink-3" />
       </button>
       <Popover open={open} onClose={() => setOpen(false)} className="w-[min(92vw,360px)] overflow-hidden">
         <div className="border-b border-rule p-3">
-          <p className="eyebrow px-1">Act as</p>
+          <div className="flex items-baseline justify-between px-1">
+            <p className="eyebrow">Act as</p>
+            {!!others && (
+              <span className="flex items-center gap-1.5 text-[11.5px] font-medium text-stamp">
+                <span className="size-2 rounded-full bg-stamp" /> {others} with unanswered requests
+              </span>
+            )}
+          </div>
           <label className="mt-2 flex items-center gap-2 rounded-xl border border-rule-2 bg-sheet-2 px-3 py-2">
             <Search size={15} className="text-ink-3" />
             <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Find a business" className="w-full bg-transparent text-[14px] outline-none" />
@@ -97,11 +112,26 @@ function PersonaSwitcher() {
                 }}
                 className={clsx("flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-left hover:bg-paper-deep", b.id === actorId && "bg-mor-soft/70")}
               >
-                <Avatar id={b.id} name={b.name} size={34} />
+                <span className="relative">
+                  <Avatar id={b.id} name={b.name} size={34} />
+                  {b.pending > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-stamp px-1 text-[10.5px] font-bold text-white tabular ring-2 ring-sheet">
+                      {b.pending}
+                    </span>
+                  )}
+                </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[14px] font-semibold text-ink">{b.name}</span>
                   <span className="block truncate text-[12px] text-ink-3">
-                    {b.owner} · {b.category} · {b.city}
+                    {b.pending > 0 ? (
+                      <span className="font-semibold text-stamp">
+                        {b.pending} unanswered request{b.pending === 1 ? "" : "s"}
+                      </span>
+                    ) : (
+                      <>
+                        {b.owner} · {b.category} · {b.city}
+                      </>
+                    )}
                   </span>
                 </span>
                 <ScoreChip score={b.score} band={b.band} />
