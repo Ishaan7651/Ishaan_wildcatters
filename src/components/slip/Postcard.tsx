@@ -36,7 +36,7 @@ export function Postcard({
       <div className={clsx("grid gap-4", compact ? "grid-cols-[1fr_auto] p-3.5" : "grid-cols-[1fr_auto] p-4 sm:p-5")}>
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="eyebrow !text-[10px]">Post card · डाक</span>
+            <span className="eyebrow !text-[10px]">Post card</span>
             <span className="rounded-full px-2 py-px text-[11px] font-semibold" style={{ color: t.color, background: `color-mix(in oklab, ${t.color} 13%, transparent)` }}>
               {t.label}
             </span>
@@ -54,7 +54,7 @@ export function Postcard({
           )}
         </div>
         <div className="flex w-[84px] flex-col items-end gap-2 border-l border-dashed border-[color-mix(in_oklab,var(--haldi)_45%,var(--rule))] pl-3">
-          <div className="grid size-12 place-items-center rounded-[4px] border-2 border-dotted border-stamp/60 font-deva text-[16px] text-stamp">डा</div>
+          <div className="grid size-12 place-items-center rounded-[4px] border-2 border-dotted border-stamp/60 font-semibold text-[16px] text-stamp">M</div>
           {date && (
             <div className="grid size-14 place-items-center rounded-full border border-ink-3/50 text-center text-[9px] leading-tight font-semibold tracking-wide text-ink-3 uppercase -rotate-12">
               Saakh

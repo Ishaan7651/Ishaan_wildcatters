@@ -14,7 +14,7 @@ export const NAV = [
   { href: "/bahi", label: "Ledger", hindi: "बही", icon: BookOpen, hint: "Every slip, every rupee" },
   { href: "/map", label: "Trust map", hindi: "नक्शा", icon: Network, hint: "Who owes whom" },
   { href: "/lake", label: "Data lake", hindi: "भंडार", icon: Database, hint: "The tamper-proof log" },
-  { href: "/agents", label: "Agents", hindi: "कारिंदे", icon: Bot, hint: "The AI crew at work" },
+  { href: "/agents", label: "Agents", hindi: "एजेंट", icon: Bot, hint: "The AI crew at work" },
 ];
 
 function useInboxCount() {

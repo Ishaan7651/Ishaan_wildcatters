@@ -66,7 +66,7 @@ export function Parchi({
         <div className="parchi-notch flex rounded-[18px] border border-rule-2 bg-sheet">
           {/* counterfoil */}
           <div className="hidden w-[68px] shrink-0 flex-col items-center justify-between py-4 sm:flex">
-            <span className="display text-[11px] font-semibold tracking-[0.22em] text-ink-3 [writing-mode:vertical-rl] rotate-180">SAAKH · पर्ची</span>
+            <span className="display text-[11px] font-semibold tracking-[0.22em] text-ink-3 [writing-mode:vertical-rl] rotate-180">SAAKH · SLIP</span>
             <span className="hand text-[15px] leading-none" style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}>
               {amount ? rupeesShort(amount) : "—"}
             </span>
@@ -78,7 +78,7 @@ export function Parchi({
           <div className="relative min-w-0 flex-1 px-5 pt-4 pb-5 sm:px-6">
             <div className="flex items-center justify-between gap-3">
               <span className="eyebrow">
-                {draft ? "Draft parchi" : "Parchi"} <span className="font-deva tracking-normal normal-case">· पर्ची</span>
+                {draft ? "Draft slip" : "Slip"}
               </span>
               <span className="font-mono text-[11px] text-ink-3">
                 {code}

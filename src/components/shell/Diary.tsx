@@ -54,10 +54,7 @@ export function Diary({ embedded = false, limit = 40, agent }: { embedded?: bool
     <div className="flex h-full flex-col">
       {!embedded && (
         <div className="border-b border-rule px-5 pt-5 pb-4">
-          <div className="flex items-baseline gap-2">
-            <h2 className="display text-[19px] font-semibold text-ink">Roznamcha</h2>
-            <span className="font-deva text-[14px] text-ink-4">रोज़नामचा</span>
-          </div>
+          <h2 className="display text-[19px] font-semibold text-ink">Activity log</h2>
           <p className="text-[12.5px] text-ink-3">The agents&apos; daily diary — every step they take, as it happens.</p>
         </div>
       )}

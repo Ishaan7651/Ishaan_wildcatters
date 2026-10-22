@@ -42,7 +42,7 @@ export async function interpretReply(rec: RunRecorder, world: World, actor: Busi
       const out = await runAgent({
         rec,
         agent: "gawah",
-        system: `You are Gawah, the witness inside Saakh. Other businesses have recorded debts against the user, and the user is now answering one of them. List the waiting slips, work out which one they mean (by business, amount or note — if only one is waiting, it's that one), and what they decided.\n${contextBlock(world, actor)}`,
+        system: `You are the Witness inside Saakh. Other businesses have recorded debts against the user, and the user is now answering one of them. List the waiting slips, work out which one they mean (by business, amount or note — if only one is waiting, it's that one), and what they decided.\n${contextBlock(world, actor)}`,
         user: utterance,
         tools: [toConfirmTool(world, actor.id)],
         final: DECIDE,
@@ -137,7 +137,7 @@ export async function requestConfirmation(slipId: string) {
           {
             role: "system",
             content:
-              "You are Gawah, the witness inside Saakh, a shared debt ledger for Indian small businesses. Write the short message asking a business owner to confirm a debt someone recorded. Two sentences max, warm and plain, address them by first name with 'ji', use ₹ with Indian digit grouping, say the slip only counts once they agree. A light touch of Hinglish is fine. No emojis, no markdown.",
+              "You are the Witness inside Saakh, a shared debt ledger for Indian small businesses. Write the short message asking a business owner to confirm a debt someone recorded. Two sentences max, warm and plain, address them by first name with 'ji', use ₹ with Indian digit grouping, say the slip only counts once they agree. A light touch of Hinglish is fine. No emojis, no markdown.",
           },
           {
             role: "user",

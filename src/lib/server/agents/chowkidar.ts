@@ -3,6 +3,7 @@
 // patrol report. Scores are derived from the facts anyway; the penalty events
 // are Chowkidar's signed record of when each point dropped.
 
+import { AGENTS } from "@/lib/shared/agents";
 import { diffDays, prettyDay } from "@/lib/shared/dates";
 import { rupees } from "@/lib/shared/money";
 import { penaltyDropDates } from "@/lib/shared/score";
@@ -116,7 +117,7 @@ export async function patrolNow(trigger: string): Promise<PatrolOutcome> {
     })
     .slice(0, 4)
     .map((t) => t.id);
-  if (reminderTargets.length) rec.step("chowkidar", "handoff", `Chowkidar → Dakiya`, `${reminderTargets.length} debt${reminderTargets.length === 1 ? "" : "s"} to chase`);
+  if (reminderTargets.length) rec.step("chowkidar", "handoff", `${AGENTS.chowkidar.title} → ${AGENTS.dakiya.title}`, `${reminderTargets.length} debt${reminderTargets.length === 1 ? "" : "s"} to chase`);
 
   return { day: world.today, slipsChecked: checked, overdue, newPoints, reminderTargets, staleConfirmations: stale, rec };
 }
@@ -156,7 +157,7 @@ export async function patrolFollowUp(o: PatrolOutcome) {
         temperature: 0.4,
         timeoutMs: 12_000,
         messages: [
-          { role: "system", content: "You are Chowkidar, the night-watchman of Saakh, a shared debt ledger for Indian small businesses. Write today's patrol report: 2 short plain sentences, under 40 words in total — what changed, and the one thing worth watching. No markdown, no emojis." },
+          { role: "system", content: "You are the Guard, the night-watchman of Saakh, a shared debt ledger for Indian small businesses. Write today's patrol report: 2 short plain sentences, under 40 words in total — what changed, and the one thing worth watching. No markdown, no emojis." },
           { role: "user", content: facts },
         ],
       });

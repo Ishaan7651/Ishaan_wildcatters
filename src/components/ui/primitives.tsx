@@ -91,7 +91,7 @@ export function AgentGlyph({ agent, size = 26, className }: { agent: AgentName; 
   return (
     <span
       title={`${a.title} · ${a.role}`}
-      className={clsx("inline-grid shrink-0 place-items-center rounded-full font-deva leading-none", className)}
+      className={clsx("inline-grid shrink-0 place-items-center rounded-full font-semibold leading-none", className)}
       style={{
         width: size,
         height: size,

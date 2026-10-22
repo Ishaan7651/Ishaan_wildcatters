@@ -21,10 +21,10 @@ function examplesFor(s: AppState | undefined): string[] {
   const check = me === "sharma-traders" ? "Sunrise Steel" : "Sharma Traders";
   const ex = [`${other} owes me ₹2,000 by 31 Oct`, `Score for ${check}?`];
   const c = s?.toConfirm[0];
-  if (c) ex.push(`Haan, ${c.raisedBy === "creditor" ? c.creditor.name : c.debtor.name} ka ₹${c.amount.toLocaleString("en-IN")} sahi hai`);
+  if (c) ex.push(`Yes, ${c.raisedBy === "creditor" ? c.creditor.name : c.debtor.name}'s ₹${c.amount.toLocaleString("en-IN")} is right`);
   const o = s?.overdueToMe[0];
   if (o) ex.push(`Remind ${o.debtor.name}`);
-  ex.push("Who has the lowest score?", "I owe Ganga Packaging 12k, 15 din mein");
+  ex.push("Who has the lowest score?", "I owe Ganga Packaging 12k in 15 days");
   return ex;
 }
 

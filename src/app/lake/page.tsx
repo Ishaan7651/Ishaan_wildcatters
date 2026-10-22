@@ -262,7 +262,7 @@ function Pipeline() {
     { t: "Rules check", g: null },
     { t: "Lake appends", g: null },
     { t: "Scores & inbox computed", g: null },
-    { t: "Chowkidar patrols daily", g: "chowkidar" as const },
+    { t: "The Guard patrols daily", g: "chowkidar" as const },
   ];
   return (
     <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-2 text-[13px]" aria-label="How a fact reaches the lake">

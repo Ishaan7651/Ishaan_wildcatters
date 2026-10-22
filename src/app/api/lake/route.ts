@@ -46,7 +46,7 @@ function describe(e: LakeEvent, biz: Map<string, { name: string }>): string {
     case "slip.raised":
       return `${d.code}: ${n(d.debtorId)} owes ${n(d.creditorId)} ${rupees(d.amount as number)}, due ${prettyDay(d.dueDate as string)}`;
     case "confirmation.requested":
-      return `Gawah asked ${n(d.to)} to confirm`;
+      return `Witness asked ${n(d.to)} to confirm`;
     case "slip.confirmed":
       return `${n(d.by)} confirmed`;
     case "slip.disputed":
@@ -62,8 +62,8 @@ function describe(e: LakeEvent, biz: Map<string, { name: string }>): string {
     case "payment.rejected":
       return `${n(d.by)} says the money hasn't arrived`;
     case "reminder.sent":
-      return `Dakiya sent a ${d.tone} reminder to ${n(d.to)}`;
+      return `Messenger sent a ${d.tone} reminder to ${n(d.to)}`;
     case "penalty.assessed":
-      return `Chowkidar: −1 for ${n(d.debtorId)} (month ${d.month} late) → ${d.scoreAfter}`;
+      return `Guard: −1 for ${n(d.debtorId)} (month ${d.month} late) → ${d.scoreAfter}`;
   }
 }

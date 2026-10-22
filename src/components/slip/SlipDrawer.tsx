@@ -100,7 +100,7 @@ function SlipDetail({ slip, today }: { slip: SlipView; today: string }) {
     try {
       setReminder(await postJSON(`/api/slips/${slip.id}/remind`, { actorId, dryRun: true }));
     } catch (e) {
-      toast({ title: "Dakiya couldn't write that", body: (e as Error).message, tone: "bad" });
+      toast({ title: "The Messenger couldn't write that", body: (e as Error).message, tone: "bad" });
       setMode(null);
     } finally {
       setRemLoading(false);
@@ -137,10 +137,10 @@ function SlipDetail({ slip, today }: { slip: SlipView; today: string }) {
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Button variant="primary" loading={busy === "confirm"} onClick={() => run(slip, "confirm", {}, "Stamped — it's on record for both of you")}>
-                <Check size={16} /> Haan, sahi hai
+                <Check size={16} /> Yes, that&apos;s right
               </Button>
               <Button variant="danger" onClick={() => setMode("dispute")}>
-                <MessageCircleWarning size={16} /> Nahi — something&apos;s wrong
+                <MessageCircleWarning size={16} /> No — something&apos;s wrong
               </Button>
             </div>
           </div>
@@ -229,10 +229,10 @@ function SlipDetail({ slip, today }: { slip: SlipView; today: string }) {
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Button variant="primary" loading={busy === "ack_payment"} onClick={() => run(slip, "ack_payment", {}, "Payment confirmed — slip closed")}>
-                <Check size={16} /> Haan, mil gaya
+                <Check size={16} /> Yes, received
               </Button>
               <Button variant="danger" loading={busy === "reject_payment"} onClick={() => run(slip, "reject_payment", {}, "Told them it hasn't arrived")}>
-                <CircleSlash size={16} /> Nahi mila
+                <CircleSlash size={16} /> Not received
               </Button>
             </div>
           </div>
@@ -278,7 +278,7 @@ function SlipDetail({ slip, today }: { slip: SlipView; today: string }) {
                 </Button>
                 {iAmLender && (
                   <Button variant="secondary" onClick={draftReminder}>
-                    <Mail size={16} /> Ask Dakiya to remind them
+                    <Mail size={16} /> Ask the Messenger to remind them
                   </Button>
                 )}
               </div>
@@ -290,7 +290,7 @@ function SlipDetail({ slip, today }: { slip: SlipView; today: string }) {
           <div className="space-y-3">
             {remLoading && !reminder ? (
               <div className="flex items-center gap-3 rounded-2xl border border-rule bg-sheet p-4 text-[14px] text-ink-2">
-                <AgentGlyph agent="dakiya" /> Dakiya is writing the reminder<span className="writing-dot">…</span>
+                <AgentGlyph agent="dakiya" /> The Messenger is writing the reminder<span className="writing-dot">…</span>
               </div>
             ) : reminder ? (
               <>

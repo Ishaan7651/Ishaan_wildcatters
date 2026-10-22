@@ -64,7 +64,7 @@ function SlipDraftResult({ turn, draft }: { turn: Turn; draft: SlipDraft }) {
     <div className="space-y-4">
       <div className="flex items-center gap-2 text-[13px] text-ink-2">
         <AgentGlyph agent="munshi" size={22} />
-        <span>Munshi filled this in. Check it, change anything, then send.</span>
+        <span>The Scribe filled this in. Check it, change anything, then send.</span>
       </div>
 
       <Parchi
@@ -172,7 +172,7 @@ function SentSlip({ slipId }: { slipId: string }) {
         <span className="flex items-center gap-2 text-[13.5px] text-ink-2">
           <AgentGlyph agent="gawah" size={22} />
           {waiting ? (
-            <>Gawah has asked <b className="text-ink">{confirmer.name}</b> to confirm.</>
+            <>The Witness has asked <b className="text-ink">{confirmer.name}</b> to confirm.</>
           ) : slip.status === "confirmed" ? (
             <>
               <b className="text-ink">{confirmer.name}</b> confirmed. It&apos;s on record.
@@ -208,7 +208,7 @@ function PaymentResult({ turn, draft, today }: { turn: Turn; draft: PaymentDraft
     <div className="space-y-3">
       <div className="flex items-center gap-2 text-[13px] text-ink-2">
         <AgentGlyph agent="munshi" size={22} />
-        <span>{chosen ? draft.explanation || "Munshi matched this payment to an open slip." : draft.explanation}</span>
+        <span>{chosen ? draft.explanation || "The Scribe matched this payment to an open slip." : draft.explanation}</span>
       </div>
       {chosen && (
         <div className="sheet p-1.5">
@@ -396,7 +396,7 @@ function ReminderResult({ turn, slip, message, tone }: { turn: Turn; slip: SlipV
       <div className="flex items-center gap-2 text-[13px] text-ink-2">
         <AgentGlyph agent="dakiya" size={22} />
         <span>
-          Dakiya wrote a <b>{tone}</b> reminder for {rupees(slip.amount)}{" "}
+          The Messenger wrote a <b>{tone}</b> reminder for {rupees(slip.amount)}{" "}
           {slip.daysToDue < 0 ? `(${-slip.daysToDue} days overdue)` : `(due ${prettyDay(slip.dueDate, false)})`}.
         </span>
       </div>

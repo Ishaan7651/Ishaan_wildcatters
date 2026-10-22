@@ -139,8 +139,8 @@ function TimeMachine() {
         title: days === 0 ? "Back to the real date" : `Saakh clock moved to ${weekdayDay(r.today)}`,
         body: r.patrol
           ? r.patrol.newPoints
-            ? `Chowkidar patrolled and took ${r.patrol.newPoints} point${r.patrol.newPoints === 1 ? "" : "s"} off late payers. ${r.patrol.overdue} debts are overdue.`
-            : `Chowkidar patrolled — no new points lost. ${r.patrol.overdue} debts overdue.`
+            ? `The Guard patrolled and took ${r.patrol.newPoints} point${r.patrol.newPoints === 1 ? "" : "s"} off late payers. ${r.patrol.overdue} debts are overdue.`
+            : `The Guard patrolled — no new points lost. ${r.patrol.overdue} debts overdue.`
           : "Scores now show this day.",
       });
     } catch (e) {

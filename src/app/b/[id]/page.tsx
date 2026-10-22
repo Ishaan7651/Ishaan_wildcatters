@@ -77,7 +77,7 @@ function ProfileView({ p, today, isMe }: { p: Profile; today: string; isMe: bool
                   ask(`Check the score for ${b.name} — how many payments are pending, and for how long?`);
                 }}
               >
-                <MessageCircleQuestion size={16} /> Ask Khoji about them
+                <MessageCircleQuestion size={16} /> Ask the Detective about them
               </Button>
               <Button variant="secondary" onClick={() => openComposer({ counterpartyId: b.id })}>
                 <PenLine size={16} /> Write a slip with them
@@ -122,7 +122,7 @@ function ProfileView({ p, today, isMe }: { p: Profile; today: string; isMe: bool
           )}
           <div className="mt-4 flex items-start gap-2.5 rounded-xl bg-paper-deep/60 px-3 py-2.5 text-[12.5px] text-ink-2">
             <AgentGlyph agent="chowkidar" size={22} />
-            <span>Chowkidar takes 1 point the day after a confirmed debt falls due unpaid, then 1 more at the start of every further month. Filled dots are still unpaid; hollow ones were paid late.</span>
+            <span>The Guard takes 1 point the day after a confirmed debt falls due unpaid, then 1 more at the start of every further month. Filled dots are still unpaid; hollow ones were paid late.</span>
           </div>
         </section>
 

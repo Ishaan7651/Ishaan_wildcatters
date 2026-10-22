@@ -95,7 +95,7 @@ export function project(all: LakeEvent[], asOf: string): World {
       case "confirmation.requested": {
         if (!slip) break;
         slip.confirmationMessages.push({ at: e.at, message: d.message as string, to: d.to as string });
-        note("asked", `Gawah asked ${name(d.to as string)} to confirm`);
+        note("asked", `The Witness asked ${name(d.to as string)} to confirm`);
         break;
       }
       case "slip.confirmed": {
@@ -161,13 +161,13 @@ export function project(all: LakeEvent[], asOf: string): World {
       case "reminder.sent": {
         if (!slip) break;
         slip.reminders.push({ at: e.at, message: d.message as string, tone: (d.tone as string) ?? "gentle" });
-        note("reminder", `Dakiya sent a ${d.tone ?? "gentle"} reminder to ${name(slip.debtorId)}`);
+        note("reminder", `The Messenger sent a ${d.tone ?? "gentle"} reminder to ${name(slip.debtorId)}`);
         break;
       }
       case "penalty.assessed": {
         if (!slip) break;
         slip.penaltiesAssessed.push(d.month as number);
-        note("penalty", `Chowkidar took 1 point off ${name(slip.debtorId)} — month ${d.month} late`);
+        note("penalty", `The Guard took 1 point off ${name(slip.debtorId)} — month ${d.month} late`);
         break;
       }
     }

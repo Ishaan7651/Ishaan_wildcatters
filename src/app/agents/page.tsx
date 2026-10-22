@@ -12,15 +12,6 @@ import { Diary } from "@/components/shell/Diary";
 import { AgentGlyph, Button } from "@/components/ui/primitives";
 import { PageHeader } from "@/components/ui/PageHeader";
 
-const HINDI: Record<AgentName, string> = {
-  sutradhar: "सूत्रधार",
-  munshi: "मुंशी",
-  gawah: "गवाह",
-  chowkidar: "चौकीदार",
-  dakiya: "डाकिया",
-  khoji: "खोजी",
-};
-
 export default function AgentsPage() {
   const { data } = useAgents(80);
   const { toast, refreshAll } = useApp();
@@ -42,7 +33,7 @@ export default function AgentsPage() {
 
   return (
     <div className="mx-auto max-w-[1180px]">
-      <PageHeader title="Agents" hindi="कारिंदे">
+      <PageHeader title="Agents">
         Six helpers. They propose — the rules decide.
       </PageHeader>
 
@@ -74,7 +65,6 @@ export default function AgentsPage() {
                 <div className="min-w-0 flex-1">
                   <h3 className="display flex items-baseline gap-2 text-[21px] font-semibold text-ink">
                     {a.title}
-                    <span className="font-deva text-[14px] font-normal text-ink-4">{HINDI[name]}</span>
                   </h3>
                   <p className="text-[13px] font-medium" style={{ color: a.color }}>
                     {a.role}
@@ -124,7 +114,7 @@ export default function AgentsPage() {
       <section className="mt-10">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <h2 className="display flex items-baseline gap-2 text-[22px] font-bold text-ink">
-            Roznamcha <span className="font-deva text-[15px] font-normal text-ink-4">रोज़नामचा</span>
+            Activity log
           </h2>
           <div className="flex flex-wrap gap-1.5">
             <button onClick={() => setFilter(null)} className={clsx("rounded-full border px-3 py-1 text-[12.5px]", !filter ? "border-ink bg-ink text-sheet" : "border-rule-2 text-ink-2")}>

@@ -27,7 +27,7 @@ const ROUTE = tool("route_request", "Send the request to the right agent.", {
 
 export async function route(rec: RunRecorder, world: World, actor: Business, utterance: string): Promise<Intent> {
   const done = (intent: Intent, detail: string) => {
-    rec.step("sutradhar", "route", `Sutradhar → ${AGENTS[AGENT_FOR[intent]].title}`, detail);
+    rec.step("sutradhar", "route", `${AGENTS.sutradhar.title} → ${AGENTS[AGENT_FOR[intent]].title}`, detail);
     return intent;
   };
 
@@ -45,7 +45,7 @@ export async function route(rec: RunRecorder, world: World, actor: Business, utt
       messages: [
         {
           role: "system",
-          content: `You are Sutradhar, the router inside Saakh.\n${contextBlock(world, actor)}\nThe user may speak English, Hindi or Hinglish; voice transcripts can be messy. Pick the single best intent.`,
+          content: `You are the Router inside Saakh.\n${contextBlock(world, actor)}\nThe user may speak English, Hindi or Hinglish; voice transcripts can be messy. Pick the single best intent.`,
         },
         { role: "user", content: utterance },
       ],

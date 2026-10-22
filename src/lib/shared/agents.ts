@@ -10,13 +10,13 @@ export interface AgentMeta {
   tools: string[];
 }
 
-/** The crew. Each is named after the person who did this job in a traditional trading house. */
+/** The crew. Keys are the original trading-house job names; titles are what the user sees. */
 export const AGENTS: Record<AgentName, AgentMeta> = {
   sutradhar: {
     name: "sutradhar",
-    title: "Sutradhar",
-    role: "Router",
-    glyph: "सू",
+    title: "Router",
+    role: "Sorts every request",
+    glyph: "R",
     color: "var(--agent-sutradhar)",
     does: [
       "Hears every voice or text request",
@@ -27,9 +27,9 @@ export const AGENTS: Record<AgentName, AgentMeta> = {
   },
   munshi: {
     name: "munshi",
-    title: "Munshi",
-    role: "Scribe",
-    glyph: "मु",
+    title: "Scribe",
+    role: "Writes the slips",
+    glyph: "S",
     color: "var(--agent-munshi)",
     does: [
       "Turns “Sharma owes me 2k by Diwali” into a filled slip",
@@ -41,22 +41,22 @@ export const AGENTS: Record<AgentName, AgentMeta> = {
   },
   gawah: {
     name: "gawah",
-    title: "Gawah",
-    role: "Witness",
-    glyph: "ग",
+    title: "Witness",
+    role: "Gets the other side's yes",
+    glyph: "W",
     color: "var(--agent-gawah)",
     does: [
       "Asks the other side to confirm every new slip",
-      "Understands “haan sahi hai” or “only 1,500” replies",
+      "Understands replies like “yes, that’s right” or “only 1,500”, in English or Hindi",
       "Stamps a slip once both sides agree",
     ],
     tools: ["list_slips_to_confirm", "submit_decision"],
   },
   chowkidar: {
     name: "chowkidar",
-    title: "Chowkidar",
-    role: "Watch",
-    glyph: "चौ",
+    title: "Guard",
+    role: "Watches for late debts",
+    glyph: "G",
     color: "var(--agent-chowkidar)",
     does: [
       "Walks the ledger every day",
@@ -68,9 +68,9 @@ export const AGENTS: Record<AgentName, AgentMeta> = {
   },
   dakiya: {
     name: "dakiya",
-    title: "Dakiya",
-    role: "Reminders",
-    glyph: "डा",
+    title: "Messenger",
+    role: "Sends reminders",
+    glyph: "M",
     color: "var(--agent-dakiya)",
     does: [
       "Drafts polite reminders before a due date",
@@ -81,9 +81,9 @@ export const AGENTS: Record<AgentName, AgentMeta> = {
   },
   khoji: {
     name: "khoji",
-    title: "Khoji",
-    role: "Inquiry",
-    glyph: "खो",
+    title: "Detective",
+    role: "Answers questions",
+    glyph: "D",
     color: "var(--agent-khoji)",
     does: [
       "Answers questions about any business’s score",

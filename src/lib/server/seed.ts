@@ -278,13 +278,13 @@ export function buildSeed(now: Date): { events: EventDraft[]; runs: AgentRun[] }
 
   runs.push(
     run("munshi", -28, 11, "Voice · Iyer Spices", `Drafted a slip: Fernandes Bakery owes ${rupees(3400)}, due ${prettyDay(addDays(today, 2), false)}.`, [
-      ["route", "Sutradhar → Munshi", "Recording a new debt"],
+      ["route", "Router → Scribe", "Recording a new debt"],
       ["tool", "find_business(\"fernandes bakery\")", "Fernandes Bakery · Panaji · 0.97"],
-      ["think", "“30 din mein” → 30 days from today"],
+      ["think", "“in 30 days” → 30 days from today"],
       ["write", "propose_slip", "₹3,400 · they owe me"],
     ], "iyer-spices", 2100),
     run("khoji", -5, 15, "Voice · Iyer Spices", "Answered: Sharma Traders' score and their 3 open payments.", [
-      ["route", "Sutradhar → Khoji", "Question about another business"],
+      ["route", "Router → Detective", "Question about another business"],
       ["tool", "find_business(\"sharma\")", "Sharma Traders · Delhi · 0.95"],
       ["tool", "get_trust_profile(sharma-traders)", "score, penalties, stats"],
       ["tool", "list_obligations(sharma-traders, debtor, pending)", "open debts"],

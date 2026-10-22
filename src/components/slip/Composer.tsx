@@ -32,7 +32,7 @@ export function useRaiseSlip() {
       toast({
         agent: "gawah",
         title: `Sent to ${other} for confirmation`,
-        body: r.invited ? `${other} isn't on Saakh yet — Gawah sent them an invite with the slip.` : "Gawah is asking them to confirm. It counts once they agree.",
+        body: r.invited ? `${other} isn't on Saakh yet — the Witness sent them an invite with the slip.` : "The Witness is asking them to confirm. It counts once they agree.",
       });
       await refreshAll();
       return r.slip;

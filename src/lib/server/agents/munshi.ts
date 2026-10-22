@@ -39,7 +39,7 @@ export async function draftSlip(rec: RunRecorder, world: World, actor: Business,
       const out = await runAgent({
         rec,
         agent: "munshi",
-        system: `You are Munshi, the scribe inside Saakh. You turn what the user said into a debt slip.\n${contextBlock(world, actor)}\n${SLIP_RULES}`,
+        system: `You are the Scribe inside Saakh. You turn what the user said into a debt slip.\n${contextBlock(world, actor)}\n${SLIP_RULES}`,
         user: utterance,
         tools: [findBusinessTool(world)],
         final: PROPOSE_SLIP,
@@ -146,7 +146,7 @@ export async function draftPayment(rec: RunRecorder, world: World, actor: Busine
       const out = await runAgent({
         rec,
         agent: "munshi",
-        system: `You are Munshi, the scribe inside Saakh. The user is reporting a payment against an existing debt. Find the other business, list the open slips with them, and pick the one that was paid (match the amount if given; otherwise the oldest due).\n${contextBlock(world, actor)}`,
+        system: `You are the Scribe inside Saakh. The user is reporting a payment against an existing debt. Find the other business, list the open slips with them, and pick the one that was paid (match the amount if given; otherwise the oldest due).\n${contextBlock(world, actor)}`,
         user: utterance,
         tools: [findBusinessTool(world), openSlipsTool(world, actor.id)],
         final: PROPOSE_PAYMENT,

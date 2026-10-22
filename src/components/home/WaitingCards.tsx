@@ -189,20 +189,20 @@ function WaitCard({
         {kind === "confirm" && (
           <>
             <Button variant="primary" className="flex-1" disabled={!!stamp} loading={busy === `${slip.id}:confirm`} onClick={() => act(slip, "confirm", "confirmed", `Stamped — ${rupees(slip.amount)} is on record`)}>
-              <Check size={16} strokeWidth={2.6} /> Haan, sahi hai
+              <Check size={16} strokeWidth={2.6} /> Yes, that&apos;s right
             </Button>
             <Button variant="secondary" disabled={!!stamp} onClick={() => openSlip(slip.id)} aria-label="No, something's wrong">
-              <X size={16} /> Nahi
+              <X size={16} /> No
             </Button>
           </>
         )}
         {kind === "ack" && (
           <>
             <Button variant="primary" className="flex-1" disabled={!!stamp} loading={busy === `${slip.id}:ack_payment`} onClick={() => act(slip, "ack_payment", "paid", "Payment confirmed — slip closed")}>
-              <Check size={16} strokeWidth={2.6} /> Haan, mil gaya
+              <Check size={16} strokeWidth={2.6} /> Yes, received
             </Button>
             <Button variant="secondary" disabled={!!stamp} loading={busy === `${slip.id}:reject_payment`} onClick={() => act(slip, "reject_payment", null, "Told them it hasn't arrived")}>
-              Nahi
+              No
             </Button>
           </>
         )}

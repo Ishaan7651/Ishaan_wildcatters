@@ -37,7 +37,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 function DiaryTitle() {
   return (
     <div className="display flex items-baseline gap-2 text-[18px] font-bold">
-      Roznamcha <span className="font-deva text-[13px] font-normal text-ink-4">रोज़नामचा</span>
+      Activity log
     </div>
   );
 }

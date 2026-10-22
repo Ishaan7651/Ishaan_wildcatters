@@ -106,8 +106,8 @@ export function ScoreRing({
           {showLabel && !small && (
             <>
               <div className="mt-1 text-[11px] font-semibold tracking-[0.14em] text-ink-3 uppercase">of 100</div>
-              <div className="mt-2 font-deva text-[13px]" style={{ color }}>
-                {BAND_META[band].hindi}
+              <div className="mt-2 text-[13px] font-semibold" style={{ color }}>
+                {BAND_META[band].label}
               </div>
             </>
           )}
