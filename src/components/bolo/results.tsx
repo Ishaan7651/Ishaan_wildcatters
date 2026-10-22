@@ -126,10 +126,11 @@ function SlipDraftResult({ turn, draft }: { turn: Turn; draft: SlipDraft }) {
         </div>
       )}
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="spotlight-actions flex flex-wrap items-center gap-2">
         <Button
           variant="primary"
           size="lg"
+          className="w-full min-w-0 sm:w-auto"
           disabled={!ready}
           loading={busy}
           onClick={async () => {
@@ -146,7 +147,11 @@ function SlipDraftResult({ turn, draft }: { turn: Turn; draft: SlipDraft }) {
             if (slip) updateTurn(turn.id, { outcome: { kind: "sent", slip } });
           }}
         >
-          <Send size={16} /> Send to {party.name || "them"} for confirmation
+          <Send size={16} className="shrink-0" />
+          <span className="truncate">
+            Send to {party.name || "them"}
+            <span className="hidden sm:inline"> for confirmation</span>
+          </span>
         </Button>
         <Button variant="ghost" onClick={() => setDirection((d) => (d === "they_owe_me" ? "i_owe_them" : "they_owe_me"))}>
           <Repeat size={15} /> Swap who owes

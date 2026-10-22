@@ -308,6 +308,19 @@ body::before {
 .writing-dot {
   animation: blink 1s ease-in-out infinite;
 }
+@keyframes talk {
+  0%, 100% { transform: scaleY(0.35); }
+  50% { transform: scaleY(1); }
+}
+/* In the voice pop-up, a slip's Send button stays in reach while the parchi scrolls past. */
+.spotlight .spotlight-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  padding-block: 28px 14px;
+  margin-top: -12px;
+  background: linear-gradient(to top, var(--paper) 72%, transparent);
+}
 .skeleton {
   background: linear-gradient(90deg, var(--paper-deep) 25%, var(--sheet-2) 50%, var(--paper-deep) 75%);
   background-size: 200% 100%;

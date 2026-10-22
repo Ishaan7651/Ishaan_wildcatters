@@ -3,7 +3,7 @@
 import { useState } from "react";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "motion/react";
-import { ChevronRight, Keyboard, Mic } from "lucide-react";
+import { ArrowUp, ChevronRight, Keyboard, Mic } from "lucide-react";
 import type { AgentName } from "@/lib/shared/types";
 import { AGENTS } from "@/lib/shared/agents";
 import { useApp, type Turn } from "@/components/providers/Providers";
@@ -36,6 +36,9 @@ export function Thread({ today }: { today: string }) {
 }
 
 function TurnCard({ turn, today }: { turn: Turn; today: string }) {
+  // A turn in the pop-up shows its result there, not twice.
+  const { spotlightId } = useApp();
+  const spotlit = spotlightId === turn.id;
   return (
     <article className="relative">
       <div className="flex items-start gap-3">
@@ -51,7 +54,11 @@ function TurnCard({ turn, today }: { turn: Turn; today: string }) {
         {turn.status === "error" && (
           <p className="mt-3 rounded-xl border border-stamp/30 bg-stamp-soft px-4 py-3 text-[14px] text-ink">{turn.error}</p>
         )}
-        {turn.result && (
+        {spotlit ? (
+          <p className="mt-3 flex items-center gap-1.5 text-[13px] text-ink-3">
+            <ArrowUp size={14} /> Showing in the pop-up
+          </p>
+        ) : turn.result && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} className="mt-3">
             <TurnResult turn={turn} today={today} />
           </motion.div>
@@ -61,7 +68,7 @@ function TurnCard({ turn, today }: { turn: Turn; today: string }) {
   );
 }
 
-function AgentTrace({ turn }: { turn: Turn }) {
+export function AgentTrace({ turn }: { turn: Turn }) {
   const [open, setOpen] = useState(false);
   const running = turn.status === "running";
   const chain: AgentName[] = [];

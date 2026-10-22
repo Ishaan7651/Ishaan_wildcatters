@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/overlay";
 import { SlipDrawer } from "@/components/slip/SlipDrawer";
 import { Composer } from "@/components/slip/Composer";
 import { Sheet } from "@/components/ui/overlay";
+import { Spotlight } from "@/components/bolo/Spotlight";
 import { TopBar } from "./TopBar";
 import { MobileNav, Rail } from "./Nav";
 import { Diary } from "./Diary";
@@ -24,6 +25,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </div>
       <MobileNav />
       {dock && <CrewDock />}
+      <Spotlight />
       <SlipDrawer />
       <Composer />
       <Sheet open={diaryOpen} onClose={() => setDiaryOpen(false)} width={460} title={<DiaryTitle />}>

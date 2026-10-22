@@ -1,5 +1,7 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
+
 let cachedVoice: SpeechSynthesisVoice | null | undefined;
 
 function pickVoice(): SpeechSynthesisVoice | null {
@@ -19,6 +21,25 @@ export function canSpeak() {
   return typeof window !== "undefined" && "speechSynthesis" in window;
 }
 
+// Whether something is being read aloud right now, for "speaking" indicators.
+let current: SpeechSynthesisUtterance | null = null;
+const listeners = new Set<() => void>();
+function setCurrent(u: SpeechSynthesisUtterance | null) {
+  current = u;
+  listeners.forEach((l) => l());
+}
+
+export function useSpeaking() {
+  return useSyncExternalStore(
+    (l) => {
+      listeners.add(l);
+      return () => listeners.delete(l);
+    },
+    () => current !== null,
+    () => false,
+  );
+}
+
 export function speak(text: string, onEnd?: () => void) {
   if (!canSpeak() || !text) return;
   window.speechSynthesis.cancel();
@@ -30,12 +51,18 @@ export function speak(text: string, onEnd?: () => void) {
   u.lang = v?.lang ?? "en-IN";
   u.rate = 1.03;
   u.pitch = 1;
-  if (onEnd) u.onend = onEnd;
+  u.onstart = () => setCurrent(u);
+  // A cancelled utterance ends after the next one may have started.
+  u.onend = u.onerror = () => {
+    if (current === u) setCurrent(null);
+    if (onEnd) onEnd();
+  };
   window.speechSynthesis.speak(u);
 }
 
 export function stopSpeaking() {
   if (canSpeak()) window.speechSynthesis.cancel();
+  setCurrent(null);
 }
 
 if (typeof window !== "undefined" && "speechSynthesis" in window) {

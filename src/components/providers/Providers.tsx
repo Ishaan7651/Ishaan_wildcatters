@@ -3,7 +3,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { SWRConfig, useSWRConfig } from "swr";
 import { MotionConfig } from "motion/react";
-import type { AgentStep, BoloEvent, BoloResult, Intent } from "@/lib/shared/types";
+import type { AgentStep, BoloEvent, BoloResult, Intent, SlipDraft } from "@/lib/shared/types";
+import { prettyDay } from "@/lib/shared/dates";
+import { rupees } from "@/lib/shared/money";
 import { speak, stopSpeaking } from "@/lib/client/speak";
 import { playSound, type SoundKind } from "@/lib/client/sounds";
 
@@ -56,6 +58,9 @@ interface AppCtx {
   openComposer: (p: ComposerPrefill | null) => void;
   turns: Turn[];
   ask: (utterance: string, source?: "voice" | "text") => Promise<void>;
+  /** The turn shown in the pop-up up top — every spoken request lands there. */
+  spotlightId: string | null;
+  setSpotlight: (id: string | null) => void;
   clearTurns: () => void;
   updateTurn: (id: string, patch: Partial<Turn>) => void;
   toasts: Toast[];
@@ -86,6 +91,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
 const DEFAULT_ACTOR = "iyer-spices";
 
+/** What's read aloud when a spoken request turns into a slip to check. */
+function slipLine(d: SlipDraft) {
+  const who = d.counterparty.name || "them";
+  const what = d.amount ? rupees(d.amount) : "the amount";
+  const owes = d.direction === "i_owe_them" ? `you owe ${who} ${what}` : `${who} owes you ${what}`;
+  return `Slip ready: ${owes}${d.dueDate ? `, due ${prettyDay(d.dueDate, false)}` : ""}. Check it, then send.`;
+}
+
 function AppProvider({ children }: { children: React.ReactNode }) {
   const { mutate } = useSWRConfig();
   const [actorId, setActorId] = useState(DEFAULT_ACTOR);
@@ -94,6 +107,7 @@ function AppProvider({ children }: { children: React.ReactNode }) {
   const [slipId, setSlipId] = useState<string | null>(null);
   const [composer, setComposer] = useState<ComposerPrefill | null>(null);
   const [turns, setTurns] = useState<Turn[]>([]);
+  const [spotlightId, setSpotlight] = useState<string | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [diaryOpen, setDiaryOpen] = useState(false);
   const toastSeq = useRef(0);
@@ -115,6 +129,7 @@ function AppProvider({ children }: { children: React.ReactNode }) {
 
   const setActor = useCallback((id: string) => {
     setActorId(id);
+    setSpotlight(null);
     try {
       localStorage.setItem("saakh.actor", id);
     } catch {}
@@ -159,6 +174,7 @@ function AppProvider({ children }: { children: React.ReactNode }) {
       stopSpeaking();
       const id = `turn_${Date.now().toString(36)}`;
       setTurns((ts): Turn[] => [{ id, utterance: text, source, at: Date.now(), actorId, steps: [], status: "running" as const }, ...ts].slice(0, 12));
+      if (source === "voice") setSpotlight(id);
       const patch = (fn: (t: Turn) => Partial<Turn>) => setTurns((ts) => ts.map((t) => (t.id === id ? { ...t, ...fn(t) } : t)));
       try {
         const res = await fetch("/api/bolo", {
@@ -189,7 +205,15 @@ function AppProvider({ children }: { children: React.ReactNode }) {
               if (speakRef.current) {
                 const r = e.result;
                 const line =
-                  r.kind === "answer" ? r.speech : r.kind === "response" ? r.speech : r.kind === "message" ? r.text : null;
+                  r.kind === "answer"
+                    ? r.speech
+                    : r.kind === "response"
+                      ? r.speech
+                      : r.kind === "message"
+                        ? r.text
+                        : r.kind === "slip_draft" && source === "voice"
+                          ? slipLine(r.draft)
+                          : null;
                 if (line) speak(line);
               }
               if (e.result.kind === "response" && e.result.applied) refreshAll();
@@ -221,6 +245,8 @@ function AppProvider({ children }: { children: React.ReactNode }) {
       openComposer: setComposer,
       turns,
       ask,
+      spotlightId,
+      setSpotlight,
       clearTurns: () => setTurns([]),
       updateTurn,
       toasts,
@@ -230,7 +256,7 @@ function AppProvider({ children }: { children: React.ReactNode }) {
       diaryOpen,
       setDiaryOpen,
     }),
-    [actorId, setActor, speakAnswers, setSpeakAnswers, soundsOn, setSoundsOn, slipId, composer, turns, ask, updateTurn, toasts, toast, dismissToast, refreshAll, diaryOpen],
+    [actorId, setActor, speakAnswers, setSpeakAnswers, soundsOn, setSoundsOn, slipId, composer, turns, ask, spotlightId, updateTurn, toasts, toast, dismissToast, refreshAll, diaryOpen],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
