@@ -106,15 +106,6 @@ export default function MapPage() {
         </div>
       </div>
 
-      <ul className="mb-4 grid gap-2 md:grid-cols-3">
-        {insights.map((t) => (
-          <li key={t} className="flex gap-3 rounded-2xl border border-stamp/20 bg-sheet px-4 py-3 text-[13.5px] leading-snug text-ink-2">
-            <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-stamp-soft text-[12px] font-bold text-stamp">!</span>
-            {t}
-          </li>
-        ))}
-      </ul>
-
       <div className="sheet relative overflow-hidden">
         {mode === "geo" ? (
           <GeoMap
@@ -189,6 +180,15 @@ export default function MapPage() {
           )}
         </div>
       </div>
+
+      <ul className="mt-4 grid gap-2 md:grid-cols-3">
+        {insights.map((t) => (
+          <li key={t} className="flex gap-3 rounded-2xl border border-stamp/20 bg-sheet px-4 py-3 text-[13.5px] leading-snug text-ink-2">
+            <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-stamp-soft text-[12px] font-bold text-stamp">!</span>
+            {t}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

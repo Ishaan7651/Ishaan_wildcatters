@@ -3,16 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import { BookOpen, Bot, Database, Inbox, Mic, Network, RotateCcw } from "lucide-react";
+import { BookOpen, Bot, Database, Inbox, MapPinned, Mic, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { useAppState, postJSON } from "@/lib/client/api";
 import { useApp } from "@/components/providers/Providers";
 
 export const NAV = [
-  { href: "/", label: "Bolo", hindi: "बोलो", icon: Mic, hint: "Speak or ask anything" },
+  { href: "/", label: "Home", hindi: "बोलो", icon: Mic, hint: "Home — speak or ask anything" },
   { href: "/inbox", label: "Inbox", hindi: "डाक", icon: Inbox, hint: "Waiting for your yes" },
   { href: "/bahi", label: "Ledger", hindi: "बही", icon: BookOpen, hint: "Every slip, every rupee" },
-  { href: "/map", label: "Trust map", hindi: "नक्शा", icon: Network, hint: "Who owes whom" },
+  { href: "/map", label: "Trust map", hindi: "नक्शा", icon: MapPinned, hint: "Who owes whom" },
   { href: "/lake", label: "Data lake", hindi: "भंडार", icon: Database, hint: "The tamper-proof log" },
   { href: "/agents", label: "Agents", hindi: "एजेंट", icon: Bot, hint: "The AI crew at work" },
 ];
@@ -133,13 +133,12 @@ export function MobileNav() {
           if (n.href === "/")
             return (
               <li key={n.href} className="flex justify-center">
-                <Link
-                  href="/"
-                  className="relative -mt-7 grid size-[62px] place-items-center rounded-full bg-genda text-on-genda shadow-[0_12px_26px_-10px_var(--genda-2)] ring-[5px] ring-paper"
-                  aria-label="Bolo — speak or ask"
-                >
-                  <span className="absolute inset-0 rounded-full bg-genda" style={{ animation: "breathe 3.2s ease-in-out infinite" }} aria-hidden />
-                  <Mic size={25} strokeWidth={2.3} className="relative" />
+                <Link href="/" aria-current={active ? "page" : undefined} className="flex flex-col items-center gap-0.5" aria-label="Home — speak or ask">
+                  <span className="relative -mt-7 grid size-[62px] place-items-center rounded-full bg-genda text-on-genda shadow-[0_12px_26px_-10px_var(--genda-2)] ring-[5px] ring-paper">
+                    <span className="absolute inset-0 rounded-full bg-genda" style={{ animation: "breathe 3.2s ease-in-out infinite" }} aria-hidden />
+                    <Mic size={25} strokeWidth={2.3} className="relative" />
+                  </span>
+                  <span className={clsx("text-[11px] font-semibold", active ? "text-genda-ink" : "text-ink-3")}>Home</span>
                 </Link>
               </li>
             );

@@ -48,6 +48,7 @@ export function Taraazu({ stats }: { stats: ProfileStats }) {
   // Start weighing once the scale is on screen, so nobody misses it.
   const ref = useRef<HTMLButtonElement>(null);
   const seen = useInView(ref, { once: true, amount: 0.4 });
+  const onScreen = useInView(ref, { amount: 0.1 });
   const lena = stats.owed.amount;
   const dena = stats.owes.amount;
   const total = lena + dena;
@@ -96,7 +97,29 @@ export function Taraazu({ stats }: { stats: ProfileStats }) {
   useMotionValueEvent(spring, "change", (angle) => setPose({ angle, swing: clamp(-spring.getVelocity() * 0.09, -9, 9) }));
   useMotionValueEvent(spring, "animationComplete", () => setPose((p) => ({ ...p, swing: 0 })));
 
-  const rad = (pose.angle * Math.PI) / 180;
+  // Never quite still: a slow breath in the beam and a lazy sway in the pans,
+  // from two out-of-step sines so it doesn't look like a loop. Paused off screen.
+  const [t, setT] = useState(0);
+  useEffect(() => {
+    if (reduce || !onScreen) return;
+    const t0 = performance.now() - t * 1000;
+    let raf = 0;
+    let last = 0;
+    const loop = (now: number) => {
+      raf = requestAnimationFrame(loop);
+      if (now - last < 33) return;
+      last = now;
+      setT((now - t0) / 1000);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduce, onScreen]);
+  const breathe = Math.sin(t * 1.15) * 1.3 + Math.sin(t * 0.47 + 1) * 0.8;
+  const sway = Math.sin(t * 1.6 + 0.5) * 2.4 + Math.sin(t * 0.7) * 1.2;
+  const angle = pose.angle + breathe;
+
+  const rad = (angle * Math.PI) / 180;
   const left = { x: PX - ARM * Math.cos(rad), y: PY - ARM * Math.sin(rad) };
   const right = { x: PX + ARM * Math.cos(rad), y: PY + ARM * Math.sin(rad) };
 
@@ -122,14 +145,14 @@ export function Taraazu({ stats }: { stats: ProfileStats }) {
           {/* the kaanta: a needle over a little arc, reading the tilt */}
           <path d={`M ${PX - 24} ${PY - 24} A 34 34 0 0 1 ${PX + 24} ${PY - 24}`} fill="none" stroke="var(--rule-2)" strokeWidth={2} strokeLinecap="round" />
           <line x1={PX} y1={PY - 33} x2={PX} y2={PY - 39} stroke="var(--ink-3)" strokeWidth={2} strokeLinecap="round" />
-          <line x1={PX} y1={PY} x2={PX} y2={PY - 30} stroke="var(--stamp)" strokeWidth={2.5} strokeLinecap="round" transform={`rotate(${pose.angle} ${PX} ${PY})`} />
+          <line x1={PX} y1={PY} x2={PX} y2={PY - 30} stroke="var(--stamp)" strokeWidth={2.5} strokeLinecap="round" transform={`rotate(${angle} ${PX} ${PY})`} />
 
           {/* beam */}
           <line x1={left.x} y1={left.y} x2={right.x} y2={right.y} stroke="var(--ink)" strokeWidth={6} strokeLinecap="round" />
           <circle cx={PX} cy={PY} r={9} fill="var(--genda)" stroke="var(--ink)" strokeWidth={2.5} />
 
-          <Pan at={left} swing={pose.swing} shown={lenaShown} dropped={lenaIn} extra={stats.owed.count - lenaShown} overdue={stats.owed.overdueCount} side="lena" />
-          <Pan at={right} swing={pose.swing} shown={denaShown} dropped={denaIn} extra={stats.owes.count - denaShown} overdue={stats.owes.overdueCount} side="dena" />
+          <Pan at={left} swing={pose.swing + sway} shown={lenaShown} dropped={lenaIn} extra={stats.owed.count - lenaShown} overdue={stats.owed.overdueCount} side="lena" />
+          <Pan at={right} swing={pose.swing - sway * 0.8} shown={denaShown} dropped={denaIn} extra={stats.owes.count - denaShown} overdue={stats.owes.overdueCount} side="dena" />
         </svg>
       </button>
 
