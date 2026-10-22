@@ -1,7 +1,7 @@
 "use client";
 
 import useSWR from "swr";
-import type { AgentRun, AppState, BizLite, Profile, SlipView } from "@/lib/shared/types";
+import type { AgentRun, AppState, BizLite, Located, Profile, SlipView } from "@/lib/shared/types";
 
 export async function getJSON<T>(url: string): Promise<T> {
   const r = await fetch(url, { cache: "no-store" });
@@ -47,6 +47,7 @@ export function useSlip(id: string | null) {
 export interface NetNode extends BizRow {
   lat: number;
   lng: number;
+  located: Located | null;
 }
 export interface NetLink {
   source: string;
@@ -58,7 +59,10 @@ export interface NetLink {
   awaiting: number;
 }
 export function useNetwork() {
-  return useSWR<{ nodes: NetNode[]; links: NetLink[]; today: string }>("/api/network", getJSON, { refreshInterval: 15000 });
+  // Poll faster while the geocoder is still finding shops.
+  return useSWR<{ nodes: NetNode[]; links: NetLink[]; today: string; locating: number }>("/api/network", getJSON, {
+    refreshInterval: (d) => (d?.locating ? 3000 : 15000),
+  });
 }
 
 export interface AgentStat {

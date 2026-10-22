@@ -13,8 +13,17 @@ export interface Business {
   joinedOn: string;
   lat: number;
   lng: number;
+  /** Where lat/lng came from. Missing until the geocoder has looked the business up. */
+  located?: Located;
   /** Set when a business was added by someone else's slip and hasn't joined yet. */
   invitedBy?: string;
+}
+
+export interface Located {
+  address: string;
+  /** "market": OpenStreetMap found the shop's market; "city": only its city; "pin": the owner placed it. */
+  precision: "market" | "city" | "pin";
+  source: "openstreetmap" | "owner";
 }
 
 export type Band = "excellent" | "good" | "watch" | "risky";

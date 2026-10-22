@@ -43,6 +43,8 @@ function describe(e: LakeEvent, biz: Map<string, { name: string }>): string {
   switch (e.type) {
     case "business.registered":
       return `${d.name} joined (${d.category}, ${d.city})`;
+    case "business.located":
+      return d.source === "owner" ? `${n(d.id)} moved its pin to ${d.address}` : `Detective found ${n(d.id)} on OpenStreetMap: ${d.address}`;
     case "slip.raised":
       return `${d.code}: ${n(d.debtorId)} owes ${n(d.creditorId)} ${rupees(d.amount as number)}, due ${prettyDay(d.dueDate as string)}`;
     case "confirmation.requested":

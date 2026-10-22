@@ -7,6 +7,7 @@ import { motion } from "motion/react";
 import { Check, ChevronRight, Download, Link2, ShieldCheck, ShieldX } from "lucide-react";
 import type { AgentName } from "@/lib/shared/types";
 import { istDay, istTime, prettyDay } from "@/lib/shared/dates";
+import { AGENTS } from "@/lib/shared/agents";
 import { getJSON } from "@/lib/client/api";
 import { AgentGlyph, Avatar, Button } from "@/components/ui/primitives";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -114,7 +115,8 @@ export default function LakePage() {
         <ol>
           {(data?.events ?? []).map((e, i) => {
             const fam = FAMILY[e.type.split(".")[0]] ?? "var(--ink-2)";
-            const agent = e.actor.startsWith("agent:") ? (e.actor.slice(6) as AgentName) : null;
+            const name = e.actor.startsWith("agent:") ? e.actor.slice(6) : null;
+            const agent = name && name in AGENTS ? (name as AgentName) : null;
             const isOpen = open === e.seq;
             return (
               <li key={e.id} className="border-b border-rule last:border-0">

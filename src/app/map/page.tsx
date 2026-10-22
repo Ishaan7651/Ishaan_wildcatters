@@ -4,73 +4,43 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import clsx from "clsx";
 import { forceCollide, forceLink, forceManyBody, forceSimulation, forceX, forceY, type SimulationLinkDatum, type SimulationNodeDatum } from "d3-force";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, LoaderCircle, MapPin, Navigation, Search } from "lucide-react";
 import { rupees, rupeesShort } from "@/lib/shared/money";
-import { useNetwork, type NetLink, type NetNode } from "@/lib/client/api";
+import { getJSON, postJSON, useNetwork, type NetNode } from "@/lib/client/api";
 import { useApp } from "@/components/providers/Providers";
 import { ScoreRing } from "@/components/score/ScoreRing";
-import { BAND_COLOR, ScoreChip } from "@/components/ui/primitives";
+import { ScoreChip } from "@/components/ui/primitives";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { GeoMap } from "@/components/map/GeoMap";
+import { MarkDefs, NetworkMarks, endId, radiusFor, type Link as NetLinkDrawn } from "@/components/map/NetworkMarks";
 
-type N = NetNode & SimulationNodeDatum & { r: number; gx: number; gy: number };
-type L = Omit<NetLink, "source" | "target"> & SimulationLinkDatum<N> & { source: N | string; target: N | string };
+type N = NetNode & SimulationNodeDatum & { r: number };
+type L = NetLinkDrawn & SimulationLinkDatum<N>;
 
 const W = 960;
 const H = 760;
-// India's trading towns, roughly placed: longitude → x, latitude → y
-const gx = (lng: number) => 90 + ((lng - 71.5) / (90 - 71.5)) * (W - 180);
-const gy = (lat: number) => 60 + ((31.5 - lat) / (31.5 - 8.5)) * (H - 130);
 
-// Where each business last settled, so refreshes don't make the map jump.
+// Where each business last settled in the web layout, so refreshes don't make it jump.
 const POSITIONS = new Map<string, { x: number; y: number }>();
 
 export default function MapPage() {
-  const { data } = useNetwork();
+  const { data, mutate } = useNetwork();
   const { actorId } = useApp();
   const [mode, setMode] = useState<"geo" | "web">("geo");
   const [onlyOverdue, setOnlyOverdue] = useState(false);
   const [showPaid, setShowPaid] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [hover, setHover] = useState<string | null>(null);
-  const [, setFrame] = useState(0);
+  const [placing, setPlacing] = useState(false);
+  const [placeErr, setPlaceErr] = useState<string | null>(null);
+  const [flyTo, setFlyTo] = useState<{ lat: number; lng: number; key: number } | null>(null);
 
-  const graph = useMemo(() => {
-    if (!data) return { nodes: [] as N[], links: [] as L[] };
-    const nodes: N[] = data.nodes.map((n) => {
-      const vol = n.owes.amount + n.owed.amount;
-      const p = POSITIONS.get(n.id);
-      const r = 15 + Math.min(17, Math.sqrt(vol) / 28);
-      return { ...n, r, gx: gx(n.lng), gy: gy(n.lat), x: p?.x ?? gx(n.lng), y: p?.y ?? gy(n.lat) };
-    });
-    return { nodes, links: data.links.map((l) => ({ ...l }) as L) };
-  }, [data]);
-
-  useEffect(() => {
-    const { nodes, links } = graph;
-    if (!nodes.length) return;
-    const geo = mode === "geo";
-    const sim = forceSimulation<N>(nodes)
-      .force("link", forceLink<N, L>(links).id((d) => d.id).distance(geo ? 80 : 170).strength(geo ? 0.03 : 0.3))
-      .force("charge", forceManyBody<N>().strength(geo ? -160 : -700))
-      .force("x", forceX<N>((d) => (geo ? d.gx : W / 2)).strength(geo ? 0.32 : 0.05))
-      .force("y", forceY<N>((d) => (geo ? d.gy : H / 2)).strength(geo ? 0.32 : 0.08))
-      .force("collide", forceCollide<N>((d) => d.r + 34).strength(0.9))
-      .alpha(POSITIONS.size ? 0.5 : 1)
-      .alphaDecay(0.045)
-      .on("tick", () => {
-        for (const n of nodes) POSITIONS.set(n.id, { x: n.x ?? 0, y: n.y ?? 0 });
-        setFrame((f) => f + 1);
-      });
-    return () => {
-      sim.stop();
-    };
-  }, [graph, mode]);
-
-  const nodes = graph.nodes;
-  const links = graph.links.filter((l) => (onlyOverdue ? l.overdue > 0 : showPaid || l.open > 0 || l.awaiting > 0));
+  const nodes = useMemo(() => data?.nodes ?? [], [data]);
+  const allLinks = useMemo<NetLinkDrawn[]>(() => data?.links ?? [], [data]);
+  const visible = (l: NetLinkDrawn) => (onlyOverdue ? l.overdue > 0 : showPaid || l.open > 0 || l.awaiting > 0);
+  const links = allLinks.filter(visible);
   const byId = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes]);
   const focus = hover ?? selected;
-  const touches = (l: L, id: string) => (l.source as N).id === id || (l.target as N).id === id;
 
   const insights = useMemo(() => {
     if (!data) return [];
@@ -85,18 +55,34 @@ export default function MapPage() {
   }, [data]);
 
   const sel = selected ? byId.get(selected) : null;
+  const select = (id: string) => {
+    setPlacing(false);
+    setSelected(id === selected ? null : id);
+  };
+
+  async function place(lat: number, lng: number) {
+    if (!actorId) return;
+    setPlacing(false);
+    setPlaceErr(null);
+    try {
+      await postJSON(`/api/businesses/${actorId}/location`, { actorId, lat, lng });
+      await mutate();
+    } catch (e) {
+      setPlaceErr((e as Error).message);
+    }
+  }
 
   return (
     <div className="mx-auto max-w-[1200px]">
       <PageHeader title="Trust map" hindi="नक्शा">
-        Who owes whom. Red is overdue.
+        Who owes whom, where. Red is overdue.
       </PageHeader>
 
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <div className="seg" role="tablist" aria-label="Layout">
           {(
             [
-              ["geo", "By city"],
+              ["geo", "On the map"],
               ["web", "By connection"],
             ] as const
           ).map(([k, l]) => (
@@ -130,96 +116,41 @@ export default function MapPage() {
       </ul>
 
       <div className="sheet relative overflow-hidden">
-        <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full touch-none select-none" role="img" aria-label="Network of debts between businesses">
-          <defs>
-              <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
-                <path d="M 50 0 L 0 0 0 50" fill="none" stroke="var(--rule)" strokeWidth="0.6" />
-              </pattern>
-              {(["over", "open", "paid"] as const).map((k) => (
-                <marker key={k} id={`arrow-${k}`} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="11" markerHeight="11" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
-                  <path d="M 0 0 L 10 5 L 0 10 z" fill={k === "over" ? "var(--stamp)" : k === "open" ? "var(--mor)" : "var(--rule-2)"} />
-                </marker>
-              ))}
-            </defs>
-            <rect width={W} height={H} fill="url(#grid)" opacity={0.7} />
-            {mode === "geo" && <text x={30} y={H - 24} className="fill-ink-4" style={{ font: "500 13px var(--font-hind)" }}>Laid out roughly by city — north at the top</text>}
+        {mode === "geo" ? (
+          <GeoMap
+            nodes={nodes}
+            links={links}
+            focus={focus}
+            selected={selected}
+            actorId={actorId}
+            onHover={setHover}
+            onSelect={select}
+            onBackground={() => setSelected(null)}
+            placing={placing ? place : null}
+            flyTo={flyTo}
+          />
+        ) : (
+          <Web nodes={nodes} links={allLinks} visible={visible} focus={focus} selected={selected} actorId={actorId} onHover={setHover} onSelect={select} />
+        )}
 
-            {links.map((l, i) => {
-              const s = l.source as N;
-              const t = l.target as N;
-              if (s.x == null || t.x == null) return null;
-              const dx = t.x - s.x!;
-              const dy = t.y! - s.y!;
-              const d = Math.hypot(dx, dy) || 1;
-              const ux = dx / d;
-              const uy = dy / d;
-              const x1 = s.x! + ux * (s.r + 3);
-              const y1 = s.y! + uy * (s.r + 3);
-              const x2 = t.x! - ux * (t.r + 6);
-              const y2 = t.y! - uy * (t.r + 6);
-              const mx = (x1 + x2) / 2 - uy * d * 0.12;
-              const my = (y1 + y2) / 2 + ux * d * 0.12;
-              const kind = l.overdue > 0 ? "over" : l.open > 0 ? "open" : "paid";
-              const dim = focus && !touches(l, focus);
-              const w = kind === "paid" ? 1.2 : 1.5 + Math.min(5, Math.sqrt((kind === "over" ? l.overdue : l.open) / 4000));
-              return (
-                <path
-                  key={i}
-                  d={`M ${x1} ${y1} Q ${mx} ${my} ${x2} ${y2}`}
-                  fill="none"
-                  stroke={kind === "over" ? "var(--stamp)" : kind === "open" ? "color-mix(in oklab, var(--mor) 55%, transparent)" : "var(--rule-2)"}
-                  strokeWidth={w}
-                  strokeDasharray={kind === "over" ? "7 5" : kind === "paid" ? "3 4" : undefined}
-                  markerEnd={`url(#arrow-${kind})`}
-                  opacity={dim ? 0.12 : 1}
-                  style={kind === "over" ? { animation: "march 0.9s linear infinite" } : undefined}
-                />
-              );
-            })}
+        {mode === "geo" && !!data?.locating && (
+          <p className="absolute top-3 left-3 flex items-center gap-2 rounded-full border border-rule bg-sheet/95 px-3 py-1.5 text-[12px] text-ink-2 shadow-[var(--shadow-sheet)]">
+            <LoaderCircle size={13} className="animate-spin text-mor" />
+            Finding {data.locating} {data.locating === 1 ? "shop" : "shops"} on OpenStreetMap…
+          </p>
+        )}
+        {placeErr && !placing && (
+          <p role="alert" className="absolute top-3 left-1/2 -translate-x-1/2 rounded-full bg-stamp px-4 py-2 text-[13px] font-medium text-sheet shadow-[var(--shadow-lift)]">
+            {placeErr}
+          </p>
+        )}
+        {placing && (
+          <p className="absolute top-3 left-1/2 -translate-x-1/2 rounded-full bg-ink px-4 py-2 text-[13px] font-medium text-sheet shadow-[var(--shadow-lift)]">
+            Tap the map where your shop is
+          </p>
+        )}
 
-            {nodes.map((n) => {
-              if (n.x == null) return null;
-              const dim = focus && focus !== n.id && !links.some((l) => touches(l, focus) && touches(l, n.id));
-              const col = BAND_COLOR[n.band];
-              return (
-                <g
-                  key={n.id}
-                  transform={`translate(${n.x},${n.y})`}
-                  opacity={dim ? 0.25 : 1}
-                  onMouseEnter={() => setHover(n.id)}
-                  onMouseLeave={() => setHover(null)}
-                  onClick={() => setSelected(n.id === selected ? null : n.id)}
-                  style={{ cursor: "pointer", transition: "opacity 160ms" }}
-                  role="button"
-                  aria-label={`${n.name}, score ${n.score}`}
-                >
-                  {n.id === actorId && <circle r={n.r + 7} fill="none" stroke="var(--mor)" strokeWidth={2} strokeDasharray="3 3" />}
-                  {n.id === selected && <circle r={n.r + 5} fill="none" stroke="var(--ink)" strokeWidth={2} />}
-                  <circle r={n.r} fill={`color-mix(in oklab, ${col} 14%, var(--sheet))`} stroke={col} strokeWidth={2} />
-                  <text textAnchor="middle" dy="0.36em" fill={col} style={{ font: `700 ${Math.round(n.r * 0.85)}px var(--font-anek)`, fontStretch: "80%" }}>
-                    {n.score}
-                  </text>
-                  <text
-                    textAnchor="middle"
-                    y={n.r + 17}
-                    fill="var(--ink)"
-                    stroke="var(--sheet)"
-                    strokeWidth={4}
-                    paintOrder="stroke"
-                    style={{ font: "600 15px var(--font-hind)" }}
-                  >
-                    {n.name}
-                  </text>
-                  <text textAnchor="middle" y={n.r + 32} fill="var(--ink-3)" stroke="var(--sheet)" strokeWidth={4} paintOrder="stroke" style={{ font: "400 12.5px var(--font-hind)" }}>
-                    {n.city}
-                    {n.owes.overdueAmount ? ` · ${rupeesShort(n.owes.overdueAmount)} late` : ""}
-                  </text>
-                </g>
-              );
-            })}
-          </svg>
-
-        <div className="absolute top-3 right-3 w-[min(300px,calc(100%-24px))]">
+        <div className="absolute top-3 right-3 w-[min(310px,calc(100%-24px))]">
           {sel ? (
             <div className="rounded-2xl border border-rule bg-sheet/95 p-4 shadow-[var(--shadow-lift)] backdrop-blur-sm">
               <div className="flex items-center gap-3">
@@ -231,19 +162,30 @@ export default function MapPage() {
                   </p>
                 </div>
               </div>
-              <Connections title="Owes" list={graph.links.filter((l) => (l.source as N).id === sel.id && l.open > 0)} pick={(l) => l.target as N} />
-              <Connections title="Is owed by" list={graph.links.filter((l) => (l.target as N).id === sel.id && l.open > 0)} pick={(l) => l.source as N} />
+              <Where node={sel} onFly={() => setFlyTo({ lat: sel.lat, lng: sel.lng, key: Date.now() })} canFly={mode === "geo"} />
+              {sel.id === actorId && mode === "geo" && (
+                <PlaceMine
+                  placing={placing}
+                  onTapMode={() => setPlacing((p) => !p)}
+                  onFound={async (lat, lng) => {
+                    await place(lat, lng);
+                    setFlyTo({ lat, lng, key: Date.now() });
+                  }}
+                />
+              )}
+              <Connections title="Owes" list={allLinks.filter((l) => endId(l.source) === sel.id && l.open > 0)} pick={(l) => byId.get(endId(l.target))} />
+              <Connections title="Is owed by" list={allLinks.filter((l) => endId(l.target) === sel.id && l.open > 0)} pick={(l) => byId.get(endId(l.source))} />
               <div className="mt-3 flex items-center justify-between">
                 <Link href={`/b/${sel.id}`} className="flex items-center gap-1 text-[13px] font-medium text-mor hover:underline">
                   Full record <ArrowUpRight size={14} />
                 </Link>
-                <button onClick={() => setSelected(null)} className="text-[12px] text-ink-3 hover:text-ink">Close</button>
+                <button onClick={() => setSelected(null)} className="text-[12px] text-ink-3 hover:text-ink">
+                  Close
+                </button>
               </div>
             </div>
           ) : (
-            <p className="ml-auto w-fit rounded-full border border-rule bg-sheet/90 px-3 py-1.5 text-[12px] text-ink-3 backdrop-blur-sm">
-              Tap a circle
-            </p>
+            <p className="ml-auto w-fit rounded-full border border-rule bg-sheet/90 px-3 py-1.5 text-[12px] text-ink-3 backdrop-blur-sm">Tap a circle</p>
           )}
         </div>
       </div>
@@ -251,16 +193,135 @@ export default function MapPage() {
   );
 }
 
-function Connections({ title, list, pick }: { title: string; list: L[]; pick: (l: L) => N }) {
+/** The force-directed layout: businesses grouped by who they deal with, not where they are. */
+function Web({ nodes: source, links: all, visible, ...rest }: { nodes: NetNode[]; links: NetLinkDrawn[]; visible: (l: NetLinkDrawn) => boolean; focus: string | null; selected: string | null; actorId: string | null; onHover: (id: string | null) => void; onSelect: (id: string) => void }) {
+  const [, setFrame] = useState(0);
+  const graph = useMemo(() => {
+    const nodes: N[] = source.map((n) => {
+      const p = POSITIONS.get(n.id);
+      // Start from a rough map of India, so the web unfolds from where the shops are.
+      return { ...n, r: radiusFor(n), x: p?.x ?? 90 + ((n.lng - 71.5) / 18.5) * (W - 180), y: p?.y ?? 60 + ((31.5 - n.lat) / 23) * (H - 130) };
+    });
+    const ids = new Set(nodes.map((n) => n.id));
+    const links = all.filter((l) => ids.has(endId(l.source)) && ids.has(endId(l.target))).map((l) => ({ ...l, source: endId(l.source), target: endId(l.target) }) as L);
+    return { nodes, links };
+  }, [source, all]);
+
+  useEffect(() => {
+    const { nodes, links } = graph;
+    if (!nodes.length) return;
+    const sim = forceSimulation<N>(nodes)
+      .force("link", forceLink<N, L>(links).id((d) => d.id).distance(170).strength(0.3))
+      .force("charge", forceManyBody<N>().strength(-700))
+      .force("x", forceX<N>(W / 2).strength(0.05))
+      .force("y", forceY<N>(H / 2).strength(0.08))
+      .force("collide", forceCollide<N>((d) => d.r + 34).strength(0.9))
+      .alpha(POSITIONS.size ? 0.4 : 1)
+      .alphaDecay(0.045)
+      .on("tick", () => {
+        for (const n of nodes) POSITIONS.set(n.id, { x: n.x ?? 0, y: n.y ?? 0 });
+        setFrame((f) => f + 1);
+      });
+    return () => {
+      sim.stop();
+    };
+  }, [graph]);
+
+  const marks = graph.nodes.filter((n) => n.x != null).map((n) => ({ node: n, x: n.x!, y: n.y!, r: n.r }));
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full touch-none select-none" role="img" aria-label="Network of debts between businesses">
+      <MarkDefs />
+      <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
+        <path d="M 50 0 L 0 0 0 50" fill="none" stroke="var(--rule)" strokeWidth="0.6" />
+      </pattern>
+      <rect width={W} height={H} fill="url(#grid)" opacity={0.7} />
+      <NetworkMarks marks={marks} links={graph.links.filter(visible)} {...rest} />
+    </svg>
+  );
+}
+
+function Where({ node, onFly, canFly }: { node: NetNode; onFly: () => void; canFly: boolean }) {
+  const loc = node.located;
+  const gmaps = `https://www.google.com/maps/search/?api=1&query=${node.lat.toFixed(6)},${node.lng.toFixed(6)}`;
+  return (
+    <div className="mt-3 rounded-xl bg-sheet-2 px-3 py-2.5">
+      <p className="flex gap-1.5 text-[12.5px] leading-snug text-ink-2">
+        <MapPin size={14} className="mt-0.5 shrink-0 text-mor" />
+        <span className="line-clamp-2">{loc ? loc.address : `${node.market}, ${node.city} (finding the exact spot…)`}</span>
+      </p>
+      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px]">
+        {loc && (
+          <span className={clsx("rounded-full px-2 py-0.5 font-medium", loc.precision === "city" ? "bg-paper-deep text-ink-3" : "bg-mor-soft text-mor-ink")}>
+            {loc.precision === "pin" ? "Pinned by owner" : loc.precision === "market" ? "Market found on OSM" : "City only"}
+          </span>
+        )}
+        {canFly && (
+          <button onClick={onFly} className="font-medium text-mor hover:underline">
+            Zoom here
+          </button>
+        )}
+        <a href={gmaps} target="_blank" rel="noreferrer" className="flex items-center gap-1 font-medium text-mor hover:underline">
+          <Navigation size={12} /> Google Maps
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function PlaceMine({ placing, onTapMode, onFound }: { placing: boolean; onTapMode: () => void; onFound: (lat: number, lng: number) => Promise<void> }) {
+  const [q, setQ] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  return (
+    <form
+      className="mt-3"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        if (busy) return;
+        setBusy(true);
+        setErr(null);
+        try {
+          const hit = await getJSON<{ lat: number; lng: number }>(`/api/geocode?q=${encodeURIComponent(q)}`);
+          await onFound(hit.lat, hit.lng);
+          setQ("");
+        } catch (e) {
+          setErr((e as Error).message);
+        } finally {
+          setBusy(false);
+        }
+      }}
+    >
+      <p className="eyebrow mb-1">Your shop&apos;s location</p>
+      <div className="flex gap-1.5">
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Street, market, city"
+          className="min-w-0 flex-1 rounded-lg border border-rule bg-sheet px-2.5 py-1.5 text-[13px] text-ink outline-none focus:border-mor"
+        />
+        <button disabled={busy || q.trim().length < 3} aria-label="Find address" className="grid size-8 place-items-center rounded-lg bg-mor text-sheet disabled:opacity-40">
+          {busy ? <LoaderCircle size={14} className="animate-spin" /> : <Search size={14} />}
+        </button>
+      </div>
+      {err && <p className="mt-1 text-[12px] text-stamp">{err}</p>}
+      <button type="button" onClick={onTapMode} className="mt-1.5 text-[12px] font-medium text-mor hover:underline">
+        {placing ? "Cancel" : "…or tap it on the map"}
+      </button>
+    </form>
+  );
+}
+
+function Connections({ title, list, pick }: { title: string; list: NetLinkDrawn[]; pick: (l: NetLinkDrawn) => NetNode | undefined }) {
   if (!list.length) return null;
   return (
     <div className="mt-4">
       <p className="eyebrow mb-1">{title}</p>
       <ul className="space-y-1">
-        {list
+        {[...list]
           .sort((a, b) => b.open - a.open)
           .map((l, i) => {
             const o = pick(l);
+            if (!o) return null;
             return (
               <li key={i} className="flex items-center gap-2 text-[13px]">
                 <ScoreChip score={o.score} band={o.band} />

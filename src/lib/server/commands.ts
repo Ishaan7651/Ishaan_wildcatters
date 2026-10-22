@@ -6,6 +6,7 @@ import type { Business } from "@/lib/shared/types";
 import { istDay } from "@/lib/shared/dates";
 import { appendEvents, type EventDraft } from "./store";
 import { confirmerOf, getWorld, raiserOf, slipView } from "./views";
+import { reverse } from "./geo";
 import type { World } from "./project";
 
 export class CommandError extends Error {
@@ -172,4 +173,17 @@ export function currentSlip(slipId: string) {
   const world = getWorld();
   const s = world.slips.get(slipId);
   return s ? slipView(world, s) : null;
+}
+
+export async function placeBusiness(actorId: string, bizId: string, lat: number, lng: number) {
+  const world = getWorld();
+  const b = mustBiz(world, bizId);
+  if (b.id !== actorId) throw new CommandError("Only a business can move its own pin.", 403);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat < 6 || lat > 37.5 || lng < 68 || lng > 97.5)
+    throw new CommandError("Saakh pins have to be in India.");
+  const address = await reverse(lat, lng);
+  await appendEvents([
+    { type: "business.located", actor: actorId, data: { id: bizId, lat, lng, address, precision: "pin", source: "owner" } },
+  ]);
+  return { lat, lng, address };
 }

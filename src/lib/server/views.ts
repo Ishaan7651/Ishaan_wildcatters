@@ -352,7 +352,7 @@ export function noticesFor(world: World, actorId: string): Notice[] {
 export function network(world: World) {
   const nodes = allBusinesses(world).map((b) => {
     const biz = world.businesses.get(b.id)!;
-    return { ...b, lat: biz.lat, lng: biz.lng };
+    return { ...b, lat: biz.lat, lng: biz.lng, located: biz.located ?? null };
   });
   const links = new Map<string, { source: string; target: string; open: number; overdue: number; count: number; settled: number; awaiting: number }>();
   for (const s of world.slips.values()) {
@@ -368,5 +368,5 @@ export function network(world: World) {
     }
     links.set(key, l);
   }
-  return { nodes, links: [...links.values()], today: world.today };
+  return { nodes, links: [...links.values()], today: world.today, locating: nodes.filter((n) => !n.located).length };
 }

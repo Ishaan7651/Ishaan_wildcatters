@@ -2,7 +2,7 @@
 // the Saakh clock. Events stamped after that moment are ignored, which is what
 // makes the time machine work in both directions.
 
-import type { Business, SlipStatus, TimelineItem } from "@/lib/shared/types";
+import type { Business, Located, SlipStatus, TimelineItem } from "@/lib/shared/types";
 import { istDay } from "@/lib/shared/dates";
 import type { LakeEvent } from "./store";
 
@@ -57,6 +57,17 @@ export function project(all: LakeEvent[], asOf: string): World {
     switch (e.type) {
       case "business.registered": {
         businesses.set(d.id as string, d as unknown as Business);
+        break;
+      }
+      case "business.located": {
+        const b = businesses.get(d.id as string);
+        if (b)
+          businesses.set(b.id, {
+            ...b,
+            lat: d.lat as number,
+            lng: d.lng as number,
+            located: { address: d.address as string, precision: d.precision as Located["precision"], source: d.source as Located["source"] },
+          });
         break;
       }
       case "slip.raised": {

@@ -21,6 +21,7 @@ import { buildSeed } from "./seed";
 
 export type EventType =
   | "business.registered"
+  | "business.located"
   | "slip.raised"
   | "slip.confirmed"
   | "slip.disputed"
