@@ -6,7 +6,7 @@ A seller says *"Sharma Traders owes me ₹2,000 by 31 October."* The buyer answe
 
 Six AI agents do all the busywork: they fill in the slips, get the other side's word, keep score, chase payments and answer questions.
 
-![Asking about a business](docs/screens/1-ask.png)
+![Asking about a business](docs/screens/1-ask.jpg)
 
 ---
 
@@ -42,8 +42,8 @@ Each one is named after the person who did this job in a traditional Indian trad
 
 **It keeps working without AI.** If there's no API key, or the model is unreachable, every agent falls back to a built-in rules engine (amount, date and name parsing, keyword routing). The top bar says which mode you're in.
 
-![Recording a slip in Hinglish](docs/screens/2-record.png)
-![The borrower says "haan" and Gawah stamps it](docs/screens/3-confirm.png)
+![Recording a slip in Hinglish](docs/screens/2-record.jpg)
+![The borrower says "haan" and Gawah stamps it](docs/screens/3-confirm.jpg)
 
 ---
 
@@ -63,7 +63,7 @@ The rule lives in one function: [`src/lib/shared/score.ts`](src/lib/shared/score
 
 **Bands:** 95–100 Excellent (पक्की साख) · 85–94 Good · 70–84 Watch · below 70 Risky.
 
-![A business's record](docs/screens/4-profile-dark.png)
+![A business's record](docs/screens/4-profile.jpg)
 
 ---
 
@@ -150,6 +150,8 @@ Writes take a Postgres advisory lock and catch up on anything other instances wr
 
 The look comes from the bazaar itself. The palette is **peacock teal** (*mor*) for anything you can act on, **marigold** (*genda*) for the voice and the things worth noticing, **sindoor red** for late money, **neem green** for money that came home and **saffron** for "due soon". The shop-sign logo is a marigold tag. The tools are the ones traders actually use: the ruled **bahi-khata** register with its red margin line, **carbon-copy** receipt books (every slip is a two-ply *parchi* with a perforated counterfoil and a yellow duplicate behind it), **rubber stamps**, and India Post **postcards** for reminders. Handwritten fields are set in *Kalam* (Indian Type Foundry), headings in *Anek* (Ek Type) at signboard width, body in *Hind*, data in *IBM Plex Mono*. Devanagari labels sit beside the English ones.
 
+![The home page](docs/screens/0-home.jpg)
+
 The signature element on the home page is the **taraazu**, a shop's balance scale. What you're owed sits in one pan and what you owe in the other, one coin per open slip and red coins for late ones. The beam tips toward the heavier side on a spring. Around it:
 
 * **Score ring:** 100 marks around a seal, one per point. Each point lost is punched out in red and explained on hover, so the rule is visible rather than just stated.
@@ -158,13 +160,13 @@ The signature element on the home page is the **taraazu**, a shop's balance scal
 * **Hash chain:** the Data lake page draws the newest events as linked blocks, and *Verify every link* walks a light along the chain.
 * **Crew dock:** a corner pill shows which agent is working right now and opens the full diary.
 
-Built responsive down to phones (bottom navigation with a marigold centre mic, bottom-sheet drawers), a single light theme, visible keyboard focus and reduced-motion support. The screenshots above predate the current palette.
+Built responsive down to phones (bottom navigation with a marigold centre mic, bottom-sheet drawers), a single light theme, visible keyboard focus and reduced-motion support.
 
-![Trust map](docs/screens/5-map.png)
-![The agents](docs/screens/6-agents.png)
-![Data lake with chain verification](docs/screens/7-lake.png)
+![Trust map](docs/screens/5-map.jpg)
+![The agents](docs/screens/6-agents.jpg)
+![Data lake with chain verification](docs/screens/7-lake.jpg)
 
-<p align="center"><img src="docs/screens/8-mobile.png" width="320" alt="Mobile"></p>
+<p align="center"><img src="docs/screens/8-mobile.jpg" width="320" alt="Mobile"></p>
 
 ---
 
