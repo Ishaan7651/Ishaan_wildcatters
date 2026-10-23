@@ -28,6 +28,11 @@ export function Popover({
   align?: "left" | "right";
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const { dismissAlerts } = useApp();
+  // Alerts share the strip under the top bar on phones; opening a panel clears them so they don't cover it.
+  useEffect(() => {
+    if (open) dismissAlerts();
+  }, [open, dismissAlerts]);
   useEffect(() => {
     if (!open) return;
     const onDown = (e: MouseEvent) => {

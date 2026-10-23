@@ -66,6 +66,8 @@ interface AppCtx {
   toasts: Toast[];
   toast: (t: Omit<Toast, "id">) => void;
   dismissToast: (id: number) => void;
+  /** Clears the notification pop-ups up top; ordinary toasts stay. */
+  dismissAlerts: () => void;
   refreshAll: () => Promise<void>;
   diaryOpen: boolean;
   setDiaryOpen: (v: boolean) => void;
@@ -158,6 +160,7 @@ function AppProvider({ children }: { children: React.ReactNode }) {
     setTimeout(() => setToasts((xs) => xs.filter((x) => x.id !== id)), t.alert ? 9000 : 5200);
   }, []);
   const dismissToast = useCallback((id: number) => setToasts((xs) => xs.filter((x) => x.id !== id)), []);
+  const dismissAlerts = useCallback(() => setToasts((xs) => (xs.some((x) => x.alert) ? xs.filter((x) => !x.alert) : xs)), []);
 
   const refreshAll = useCallback(async () => {
     await mutate(() => true, undefined, { revalidate: true });
@@ -252,11 +255,12 @@ function AppProvider({ children }: { children: React.ReactNode }) {
       toasts,
       toast,
       dismissToast,
+      dismissAlerts,
       refreshAll,
       diaryOpen,
       setDiaryOpen,
     }),
-    [actorId, setActor, speakAnswers, setSpeakAnswers, soundsOn, setSoundsOn, slipId, composer, turns, ask, spotlightId, updateTurn, toasts, toast, dismissToast, refreshAll, diaryOpen],
+    [actorId, setActor, speakAnswers, setSpeakAnswers, soundsOn, setSoundsOn, slipId, composer, turns, ask, spotlightId, updateTurn, toasts, toast, dismissToast, dismissAlerts, refreshAll, diaryOpen],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
