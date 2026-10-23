@@ -8,7 +8,7 @@ import type { World } from "../project";
 import { findMentioned, searchBusinesses } from "../match";
 import { slipById, slipsFor } from "../views";
 import { hasKey, tool } from "../ai/openrouter";
-import { parseAmount, parseDirection, parseDue } from "../ai/offline";
+import { directionCue, parseAmount, parseDirection, parseDue } from "../ai/offline";
 import { runAgent, type RunRecorder } from "../ai/runtime";
 import { findBusinessTool, openSlipsTool } from "../ai/tools";
 import { contextBlock } from "./context";
@@ -26,7 +26,7 @@ const PROPOSE_SLIP = tool("propose_slip", "Submit the filled slip for the user t
 }, ["direction", "counterparty_business_id", "counterparty_name", "amount_inr", "due_date", "due_date_assumed", "due_date_reason", "note", "questions"]);
 
 const SLIP_RULES = `Rules:
-- Direction: "X owes me", "X se lena hai", "gave X on credit/udhaar" → they_owe_me. "I owe X", "X ko dena hai", "took goods from X on credit" → i_owe_them.
+- Direction is about money, seen from the user's side. "X owes me", "X se 2k lena hai" (I'm to collect ₹2,000 from X), "gave X goods on credit", "X ko udhaar diya" → they_owe_me. "I owe X", "X ko 2k dena hai", "X se maal udhaar liya", "took goods from X on credit" → i_owe_them. Goods named next to the amount are only the note: "Sharma ji se 2k lena hai elaichi ke" means Sharma owes the user ₹2,000 for cardamom.
 - Amounts: 2k = 2000, "do hazaar" = 2000, "dhai hazaar" = 2500, "dedh lakh" = 150000, "1.2 lakh" = 120000, "sava" = ×1.25, "paune" = ×0.75.
 - Dates: "by the 31st" = the next 31st that hasn't passed. "15 din mein" / "in 15 days" = today + 15. "next week" = today + 7. "month end" = last day of this month. Diwali 2026 = 2026-11-08. If no date is said, use today + 30 days and set due_date_assumed = true.
 - Always call find_business for the other party first, even if the name looks complete. Use the best match if its match score is ≥ 0.6; otherwise treat them as new (empty business_id).
@@ -45,8 +45,15 @@ export async function draftSlip(rec: RunRecorder, world: World, actor: Business,
         final: PROPOSE_SLIP,
         maxTurns: 4,
       });
+      let direction: SlipDraft["direction"] = out.direction === "i_owe_them" ? "i_owe_them" : "they_owe_me";
+      // A phrase like "X se … lena hai" settles the direction; it beats the model's reading.
+      const cue = directionCue(utterance);
+      if (cue && cue !== direction) {
+        rec.step("munshi", "think", "Direction from the words", cue === "they_owe_me" ? "They owe you" : "You owe them");
+        direction = cue;
+      }
       return finishDraft(rec, world, actor, utterance, {
-        direction: out.direction === "i_owe_them" ? "i_owe_them" : "they_owe_me",
+        direction,
         id: String(out.counterparty_business_id ?? ""),
         name: String(out.counterparty_name ?? ""),
         amount: Number(out.amount_inr) || null,

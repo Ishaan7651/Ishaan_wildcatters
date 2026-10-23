@@ -94,9 +94,24 @@ export function parseAmount(text: string, dateSpan: string | null): number | nul
   return Math.max(...pool.map((c) => c.v));
 }
 
-export function parseDirection(text: string): "they_owe_me" | "i_owe_them" {
+// Phrases that settle who owes whom on their own. "Sharma ji se 2k lena hai" is
+// money to collect from Sharma, even when goods follow ("…elaichi ke").
+const THEY_OWE_ME = [/\bowes? (?:me|us)\b/, /\bse\b.{0,40}?\b(?:lena|lene)\b/, /\budhaa?r (?:diya|diye|de diya)\b/, /\bgave\b.{0,40}\bon (?:credit|udhaa?r)\b/];
+const I_OWE_THEM = [/\bi owe\b/, /\bi (?:have|need) to pay\b/, /\bko\b.{0,40}?\b(?:dena|dene)\b/, /\budhaa?r (?:liya|li|le liya)\b/, /\bi borrowed\b/, /\btook\b.{0,40}\bon (?:credit|udhaa?r)\b/];
+
+/** The direction the words alone make clear, or null when they don't (or point both ways). */
+export function directionCue(text: string): "they_owe_me" | "i_owe_them" | null {
   const t = text.toLowerCase();
-  if (/\bi owe\b|\bi have to pay\b|\bi need to pay\b|\bko dena\b|\bdena hai\b|\bmujhe .* dena\b|\bmaine .* udhaar liya\b|\bi borrowed\b/.test(t)) return "i_owe_them";
+  const theyOwe = THEY_OWE_ME.some((r) => r.test(t));
+  const iOwe = I_OWE_THEM.some((r) => r.test(t));
+  return theyOwe === iOwe ? null : theyOwe ? "they_owe_me" : "i_owe_them";
+}
+
+export function parseDirection(text: string): "they_owe_me" | "i_owe_them" {
+  const cue = directionCue(text);
+  if (cue) return cue;
+  const t = text.toLowerCase();
+  if (/\bdena hai\b|\bmujhe .* dena\b|\bmaine .* udhaar liya\b/.test(t)) return "i_owe_them";
   return "they_owe_me";
 }
 
