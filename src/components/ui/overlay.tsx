@@ -9,7 +9,11 @@ import { useRouter } from "next/navigation";
 import { useApp, type Toast } from "@/components/providers/Providers";
 import { AgentGlyph } from "./primitives";
 
-/** Anchored panel that closes on outside click or Escape. */
+/**
+ * Anchored panel that closes on outside click or Escape. Below md it is pinned
+ * under the top bar at the right edge of the screen instead, since a 380px panel
+ * hung off a button in the middle of a narrow bar would run off the left edge.
+ */
 export function Popover({
   open,
   onClose,
@@ -50,6 +54,7 @@ export function Popover({
             "absolute top-[calc(100%+8px)] z-50 rounded-2xl border border-rule bg-sheet shadow-[var(--shadow-lift)]",
             align === "right" ? "right-0 origin-top-right" : "left-0 origin-top-left",
             className,
+            "max-md:fixed max-md:inset-x-3 max-md:top-[72px] max-md:ml-auto max-md:w-auto max-md:max-w-[400px] max-md:origin-top-right",
           )}
         >
           {children}
